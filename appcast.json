@@ -1,12 +1,12 @@
 {
   "schema": 1,
-  "version": "1.4.0",
-  "build": 108,
+  "version": "1.5.0",
+  "build": 109,
   "minimumSystemVersion": "13.0",
-  "published": "2026-10-11T18:35:25Z",
-  "url": "https://github.com/chugs024/cuelevel-updates/releases/download/v1.4.0/CueLevel-1.4.0.dmg",
-  "sha256": "64c46607f832ecf59e97f3089037187b41392e8a6ac4598de245d39f8129620f",
-  "size": 12986868,
+  "published": "2026-10-11T22:41:28Z",
+  "url": "https://github.com/chugs024/cuelevel-updates/releases/download/v1.5.0/CueLevel-1.5.0.dmg",
+  "sha256": "1d365e800f16a14caadcec4c8b0bafa6cc23b03ca0d9852f68446265df33740a",
+  "size": 13135361,
   "teamID": "327ABFB3W2",
-  "notes": "Quick Level this cue: one button at the top of the right panel. It levels the selected cue, switches to Levelled so you hear it, and shows before and after.\nEven out (on by default): loud or quiet stretches, like one speaker much louder than the rest, are brought within about 2 dB with clip gain before levelling. Volume only; edit or remove them under Clip gain. Switch it off for music.\nEven out button in the clip gain editor; automatic sections are marked \"auto\".\nThe top-bar switch is now called Level on drop."
+  "notes": "Everything now saves to Desktop › CueLevel: Levelled files named <original>_LVL-18, and dated reports in Reports.\nTrim: set in/out points (I / O, drag the flags, or Trim silence). Audio is cut; video keeps its length and the audio outside is silenced.\nFades at the start and end of a cue with Linear, Smooth or S-curve shapes, and Apply fades to all cues.\nMute a section (M), markers (Return) shown in the show report, loop (L) with pre/post-roll, play section (P).\nLive loudness meter under the transport: momentary, short-term and peak.\nKeyboard shortcuts sheet (⌘/). Optional: trim silence automatically in Quick Level."
 }
