@@ -1,12 +1,12 @@
 {
   "schema": 1,
-  "version": "1.2.0",
-  "build": 103,
+  "version": "1.2.1",
+  "build": 104,
   "minimumSystemVersion": "13.0",
-  "published": "2026-10-11T16:37:01Z",
-  "url": "https://github.com/chugs024/cuelevel-updates/releases/download/v1.2.0/CueLevel-1.2.0.dmg",
-  "sha256": "8728dfd3c4b21f844ad2af78b0db16460e224055cf8b3c60d597fa27484a38ea",
-  "size": 12826776,
+  "published": "2026-10-11T16:52:32Z",
+  "url": "https://github.com/chugs024/cuelevel-updates/releases/download/v1.2.1/CueLevel-1.2.1.dmg",
+  "sha256": "3be48d79145ca0bcd300fad20c12135daf59287ee5faf2ed8033fa3f15e8d3f6",
+  "size": 12827372,
   "teamID": "327ABFB3W2",
-  "notes": "Clip gain: select any section of a cue and drag it up or down, like Pro Tools.\nDrag fade lengths at each end of a section.\nMark a section that sounds right, then Match other sections to it to even out voices.\nEdits are volume only and are included in the levelled output."
+  "notes": "Fixed: installing an update no longer gets stuck on \"Checking the signature and installing\".\nClip gain: select any section of a cue and drag it up or down, like Pro Tools, with draggable fades.\nMark a section that sounds right, then Match other sections to it to even out voices."
 }
