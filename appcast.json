@@ -1,12 +1,12 @@
 {
   "schema": 1,
-  "version": "1.3.0",
-  "build": 107,
+  "version": "1.4.0",
+  "build": 108,
   "minimumSystemVersion": "13.0",
-  "published": "2026-10-11T18:13:31Z",
-  "url": "https://github.com/chugs024/cuelevel-updates/releases/download/v1.3.0/CueLevel-1.3.0.dmg",
-  "sha256": "b8d5d344204004c95f06ed3febb4e9e7a0c9c51701d6b9e9583b64f7097dfcfd",
-  "size": 12930271,
+  "published": "2026-10-11T18:35:25Z",
+  "url": "https://github.com/chugs024/cuelevel-updates/releases/download/v1.4.0/CueLevel-1.4.0.dmg",
+  "sha256": "64c46607f832ecf59e97f3089037187b41392e8a6ac4598de245d39f8129620f",
+  "size": 12986868,
   "teamID": "327ABFB3W2",
-  "notes": "Fader for the selected section with a live dB readout, plus dB values on every section and a dB scale.\nZoom: Option-scroll, pinch, T/R or the magnifier buttons; scroll or use the overview strip to move; time ruler.\nHear edits as you make them: playback in the editor includes your clip gain in real time.\nUndo and redo (⌘Z / ⇧⌘Z), ↑/↓ to nudge 0.5 dB (Shift for 3 dB), fades typed in milliseconds.\nPlay section and Measure section loudness buttons."
+  "notes": "Quick Level this cue: one button at the top of the right panel. It levels the selected cue, switches to Levelled so you hear it, and shows before and after.\nEven out (on by default): loud or quiet stretches, like one speaker much louder than the rest, are brought within about 2 dB with clip gain before levelling. Volume only; edit or remove them under Clip gain. Switch it off for music.\nEven out button in the clip gain editor; automatic sections are marked \"auto\".\nThe top-bar switch is now called Level on drop."
 }
