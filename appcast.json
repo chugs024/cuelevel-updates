@@ -1,12 +1,12 @@
 {
   "schema": 1,
-  "version": "1.2.1",
-  "build": 104,
+  "version": "1.2.2",
+  "build": 105,
   "minimumSystemVersion": "13.0",
-  "published": "2026-10-11T16:52:32Z",
-  "url": "https://github.com/chugs024/cuelevel-updates/releases/download/v1.2.1/CueLevel-1.2.1.dmg",
-  "sha256": "3be48d79145ca0bcd300fad20c12135daf59287ee5faf2ed8033fa3f15e8d3f6",
-  "size": 12827372,
+  "published": "2026-10-11T17:00:50Z",
+  "url": "https://github.com/chugs024/cuelevel-updates/releases/download/v1.2.2/CueLevel-1.2.2.dmg",
+  "sha256": "de22b0bae6bb34e03ef599bc3ac0d1cb8ea4c835fa349ef561b55c7292a0b5a8",
+  "size": 12822618,
   "teamID": "327ABFB3W2",
-  "notes": "Fixed: installing an update no longer gets stuck on \"Checking the signature and installing\".\nClip gain: select any section of a cue and drag it up or down, like Pro Tools, with draggable fades.\nMark a section that sounds right, then Match other sections to it to even out voices."
+  "notes": "Fixed: Install and reopen now closes CueLevel and reopens the new version by itself.\nClip gain: select any section of a cue and drag it up or down, like Pro Tools, with draggable fades.\nMark a section that sounds right, then Match other sections to it to even out voices."
 }
