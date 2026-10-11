@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "version": "1.1.0",
+  "build": 101,
+  "minimumSystemVersion": "13.0",
+  "published": "2026-10-11T15:29:04Z",
+  "url": "https://github.com/chugs024/cuelevel-updates/releases/download/v1.1.0/CueLevel-1.1.0.dmg",
+  "sha256": "bc9dce07de1838ce28fe5dd0b80caa86bc28e015f2eec05e2f4e49632592c049",
+  "size": 12723420,
+  "teamID": "327ABFB3W2",
+  "notes": "Automatic updates: CueLevel tells you when a new version is ready and installs it in one click.\nAdd as an approved reference: build your own catalogue of what good sounds like on your PA.\nReference catalogue list with remove.\nSigned and notarised build with the LGPL audio engine."
+}
