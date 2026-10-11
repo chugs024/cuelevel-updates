@@ -1,12 +1,12 @@
 {
   "schema": 1,
-  "version": "1.2.2",
-  "build": 105,
+  "version": "1.2.3",
+  "build": 106,
   "minimumSystemVersion": "13.0",
-  "published": "2026-10-11T17:00:50Z",
-  "url": "https://github.com/chugs024/cuelevel-updates/releases/download/v1.2.2/CueLevel-1.2.2.dmg",
-  "sha256": "de22b0bae6bb34e03ef599bc3ac0d1cb8ea4c835fa349ef561b55c7292a0b5a8",
-  "size": 12822618,
+  "published": "2026-10-11T18:01:50Z",
+  "url": "https://github.com/chugs024/cuelevel-updates/releases/download/v1.2.3/CueLevel-1.2.3.dmg",
+  "sha256": "2b860778a1be7080bdcb671c8fb4444d5e84ecd1fe04e75ae01845c0585756c7",
+  "size": 12822848,
   "teamID": "327ABFB3W2",
-  "notes": "Fixed: Install and reopen now closes CueLevel and reopens the new version by itself.\nClip gain: select any section of a cue and drag it up or down, like Pro Tools, with draggable fades.\nMark a section that sounds right, then Match other sections to it to even out voices."
+  "notes": "Clip gain: drag anywhere inside a section up to make it louder or down to make it quieter.\nA large dB readout shows the level while you drag, and the level line has an up/down grip.\nDone editing now re-levels the cue straight away so you can hear your edits."
 }
