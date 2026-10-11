@@ -1,12 +1,12 @@
 {
   "schema": 1,
-  "version": "1.1.0",
-  "build": 101,
+  "version": "1.1.1",
+  "build": 102,
   "minimumSystemVersion": "13.0",
-  "published": "2026-10-11T15:29:04Z",
-  "url": "https://github.com/chugs024/cuelevel-updates/releases/download/v1.1.0/CueLevel-1.1.0.dmg",
-  "sha256": "bc9dce07de1838ce28fe5dd0b80caa86bc28e015f2eec05e2f4e49632592c049",
-  "size": 12723420,
+  "published": "2026-10-11T16:04:00Z",
+  "url": "https://github.com/chugs024/cuelevel-updates/releases/download/v1.1.1/CueLevel-1.1.1.dmg",
+  "sha256": "1b5236efbf30fc967d703a3fb7a60fddb271aaaa593b07409a23f754b8c1f4f1",
+  "size": 12734451,
   "teamID": "327ABFB3W2",
-  "notes": "Automatic updates: CueLevel tells you when a new version is ready and installs it in one click.\nAdd as an approved reference: build your own catalogue of what good sounds like on your PA.\nReference catalogue list with remove.\nSigned and notarised build with the LGPL audio engine."
+  "notes": "The standard level is now −18 LUFS (live venue), with a −1 dBTP peak ceiling.\nNew pop-up when an update is ready, showing what’s new before you install.\nAfter updating, CueLevel shows what changed in the new version once."
 }
