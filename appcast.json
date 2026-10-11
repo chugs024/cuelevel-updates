@@ -1,12 +1,12 @@
 {
   "schema": 1,
-  "version": "1.5.0",
-  "build": 109,
+  "version": "1.6.0",
+  "build": 110,
   "minimumSystemVersion": "13.0",
-  "published": "2026-10-11T22:41:28Z",
-  "url": "https://github.com/chugs024/cuelevel-updates/releases/download/v1.5.0/CueLevel-1.5.0.dmg",
-  "sha256": "1d365e800f16a14caadcec4c8b0bafa6cc23b03ca0d9852f68446265df33740a",
-  "size": 13135361,
+  "published": "2026-10-11T22:50:51Z",
+  "url": "https://github.com/chugs024/cuelevel-updates/releases/download/v1.6.0/CueLevel-1.6.0.dmg",
+  "sha256": "c3eaf7578fa84e824152b1a678d7288d5723429226ac44b86766b845037be984",
+  "size": 13229458,
   "teamID": "327ABFB3W2",
-  "notes": "Everything now saves to Desktop › CueLevel: Levelled files named <original>_LVL-18, and dated reports in Reports.\nTrim: set in/out points (I / O, drag the flags, or Trim silence). Audio is cut; video keeps its length and the audio outside is silenced.\nFades at the start and end of a cue with Linear, Smooth or S-curve shapes, and Apply fades to all cues.\nMute a section (M), markers (Return) shown in the show report, loop (L) with pre/post-roll, play section (P).\nLive loudness meter under the transport: momentary, short-term and peak.\nKeyboard shortcuts sheet (⌘/). Optional: trim silence automatically in Quick Level."
+  "notes": "Transcript: see the words under the waveform and click to jump. Made on this Mac with Apple speech recognition; nothing is uploaded.\nLower gaps: turn down hiss and room noise in the pauses between phrases by 3, 6 or 10 dB.\nLow-cut and de-ess on just the selected section, faded in so they never click.\nRepair: remove DC offset and flip a channel wired out of phase, also as one-click fixes under Source checks.\nSnap: section edges and in/out points land on the quietest nearby moment so edits never cut a word.\nVersions: save alternative edits of a cue and switch between them."
 }
