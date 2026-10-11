@@ -1,12 +1,12 @@
 {
   "schema": 1,
-  "version": "1.1.1",
-  "build": 102,
+  "version": "1.2.0",
+  "build": 103,
   "minimumSystemVersion": "13.0",
-  "published": "2026-10-11T16:04:00Z",
-  "url": "https://github.com/chugs024/cuelevel-updates/releases/download/v1.1.1/CueLevel-1.1.1.dmg",
-  "sha256": "1b5236efbf30fc967d703a3fb7a60fddb271aaaa593b07409a23f754b8c1f4f1",
-  "size": 12734451,
+  "published": "2026-10-11T16:37:01Z",
+  "url": "https://github.com/chugs024/cuelevel-updates/releases/download/v1.2.0/CueLevel-1.2.0.dmg",
+  "sha256": "8728dfd3c4b21f844ad2af78b0db16460e224055cf8b3c60d597fa27484a38ea",
+  "size": 12826776,
   "teamID": "327ABFB3W2",
-  "notes": "The standard level is now −18 LUFS (live venue), with a −1 dBTP peak ceiling.\nNew pop-up when an update is ready, showing what’s new before you install.\nAfter updating, CueLevel shows what changed in the new version once."
+  "notes": "Clip gain: select any section of a cue and drag it up or down, like Pro Tools.\nDrag fade lengths at each end of a section.\nMark a section that sounds right, then Match other sections to it to even out voices.\nEdits are volume only and are included in the levelled output."
 }
