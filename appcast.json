@@ -1,12 +1,12 @@
 {
   "schema": 1,
-  "version": "1.7.0",
-  "build": 111,
+  "version": "1.8.0",
+  "build": 113,
   "minimumSystemVersion": "13.0",
-  "published": "2026-10-13T00:29:25Z",
-  "url": "https://github.com/chugs024/cuelevel-updates/releases/download/v1.7.0/CueLevel-1.7.0.dmg",
-  "sha256": "0fc2e388fe8d98de5f8b352b153d4d653af794e7ec70dcc3cbe4f5d696c9a246",
-  "size": 13259205,
+  "published": "2026-10-13T00:49:17Z",
+  "url": "https://github.com/chugs024/cuelevel-updates/releases/download/v1.8.0/CueLevel-1.8.0.dmg",
+  "sha256": "d9b4eade4bf0937391724a71a6b838ee4c684e79aa155f74a3c9ceae21654730",
+  "size": 13273533,
   "teamID": "327ABFB3W2",
-  "notes": "Even out no longer fades: each level change happens in the nearest pause with only a 5 ms click guard, so the level is simply right from that point on.\nReference shapes: CueLevel learns how much your approved references move between quieter and louder stretches (Measure reference shapes in References).\nGood range: a band on the waveform shows where good material of this content type sits, and each cue is compared with it.\nEven out now works as tightly as your good references, instead of a fixed 2 dB."
+  "notes": "Not every cue needs changing: Quick Level now checks first. A cue within 1 LU of the target, with peaks under the ceiling, nothing to even out and no source problems is marked Already good.\nAlready-good cues are left untouched: an exact copy goes into the Levelled folder (same naming), and the report says No change needed.\nThe right panel shows why a cue is already good, compared with your reference library."
 }
