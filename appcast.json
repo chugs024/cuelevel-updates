@@ -1,12 +1,12 @@
 {
   "schema": 1,
-  "version": "1.6.0",
-  "build": 110,
+  "version": "1.7.0",
+  "build": 111,
   "minimumSystemVersion": "13.0",
-  "published": "2026-10-11T22:50:51Z",
-  "url": "https://github.com/chugs024/cuelevel-updates/releases/download/v1.6.0/CueLevel-1.6.0.dmg",
-  "sha256": "c3eaf7578fa84e824152b1a678d7288d5723429226ac44b86766b845037be984",
-  "size": 13229458,
+  "published": "2026-10-13T00:29:25Z",
+  "url": "https://github.com/chugs024/cuelevel-updates/releases/download/v1.7.0/CueLevel-1.7.0.dmg",
+  "sha256": "0fc2e388fe8d98de5f8b352b153d4d653af794e7ec70dcc3cbe4f5d696c9a246",
+  "size": 13259205,
   "teamID": "327ABFB3W2",
-  "notes": "Transcript: see the words under the waveform and click to jump. Made on this Mac with Apple speech recognition; nothing is uploaded.\nLower gaps: turn down hiss and room noise in the pauses between phrases by 3, 6 or 10 dB.\nLow-cut and de-ess on just the selected section, faded in so they never click.\nRepair: remove DC offset and flip a channel wired out of phase, also as one-click fixes under Source checks.\nSnap: section edges and in/out points land on the quietest nearby moment so edits never cut a word.\nVersions: save alternative edits of a cue and switch between them."
+  "notes": "Even out no longer fades: each level change happens in the nearest pause with only a 5 ms click guard, so the level is simply right from that point on.\nReference shapes: CueLevel learns how much your approved references move between quieter and louder stretches (Measure reference shapes in References).\nGood range: a band on the waveform shows where good material of this content type sits, and each cue is compared with it.\nEven out now works as tightly as your good references, instead of a fixed 2 dB."
 }
