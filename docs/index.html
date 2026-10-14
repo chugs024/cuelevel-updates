@@ -18,9 +18,11 @@
 <meta name="twitter:card" content="summary_large_image">
 <title>CueLevel for Mac</title>
 <meta name="description" content="CueLevel levels a show's audio and video cues to one loudness for the PA, losslessly, on your Mac.">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,300..800&family=Geist:wght@300..700&display=swap">
+<link rel="preload" href="fonts/archivo.woff" as="font" type="font/woff" crossorigin>
+<style>
+@font-face{font-family:"Archivo";src:url(fonts/archivo.woff) format("woff");font-weight:100 900;font-stretch:62% 125%;font-display:swap}
+@font-face{font-family:"Geist";src:url(fonts/geist.woff) format("woff");font-weight:100 900;font-display:swap}
+</style>
 <style>
 /* Layout concept: one long graphite stage. The page behaves like CueLevel's own meter: colour only ever means level
    (blue quiet, green on target, amber changed, red hot). Sticky scroll scenes level a real example show. */
@@ -75,7 +77,8 @@ p{margin:0}
 .hero{position:relative;height:250vh}
 .hero .stage{position:sticky;top:0;min-height:100svh;display:grid;align-items:center;padding-block:96px 40px}
 .hero-grid{display:grid;grid-template-columns:minmax(0,5.4fr) minmax(0,6.6fr);gap:clamp(28px,4vw,64px);align-items:center}
-.hero h1{font-size:clamp(2.5rem,4.7vw,4.7rem);line-height:.96;letter-spacing:-.035em;font-stretch:122%;font-weight:640}
+.hero-copy{container-type:inline-size;min-width:0}
+.hero h1{font-size:clamp(2.2rem,4.7vw,4.7rem);font-size:min(4.7rem,12cqi);line-height:.96;letter-spacing:-.03em;font-stretch:112%;font-weight:640}
 .hero h1 .line{display:block;overflow:hidden;padding-bottom:.04em;white-space:nowrap}
 .hero h1 .line>span{display:block}
 .hero .lede{margin-top:26px}
@@ -286,7 +289,7 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:12px 28px;justify-content:space-bet
   <section class="hero" id="hero" aria-label="CueLevel">
     <div class="stage">
       <div class="wrap hero-grid">
-        <div>
+        <div class="hero-copy">
           <h1><span class="line mask"><span>Every cue</span></span><span class="line mask"><span>lands at the</span></span><span class="line mask"><span>same loudness.</span></span></h1>
           <p class="lede rv">CueLevel measures your show's audio and video cues and brings each one to −18&nbsp;LUFS for the PA. One exact gain change per cue. Nothing else in the file is touched.</p>
           <div class="cta-row rv">
