@@ -206,8 +206,9 @@ p{margin:0}
 .switch input:checked+.t{background:var(--good)}
 .switch input:checked+.t::after{transform:translateX(18px);background:var(--onGood)}
 .switch input:focus-visible+.t{outline:2px solid var(--good);outline-offset:3px}
-.scope{background:var(--field);border:1px solid var(--line);border-radius:14px;padding:18px;display:grid;grid-template-rows:auto 1fr auto;gap:12px;min-height:300px}
-.scope canvas{width:100%;height:100%;min-height:180px}
+.scope{background:var(--field);border:1px solid var(--line);border-radius:14px;padding:18px;display:grid;grid-template-rows:auto auto;gap:12px;align-content:start}
+.scope .plot{position:relative;height:clamp(180px,26vw,260px)}
+.scope canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
 .scope .lbl{display:flex;justify-content:space-between;font-size:.84rem;color:var(--muted)}
 .scope .lbl b{color:var(--bone);font-weight:500}
 @media (max-width:860px){.player{grid-template-columns:1fr}}
@@ -376,7 +377,7 @@ footer .tm{flex-basis:100%;max-width:60em;font-size:.78rem;color:var(--muted)}
       </div>
     </div>
     <div class="wrap editor">
-      <figure class="rv"><img src="shots/edit-host.webp" width="1415" height="840" loading="lazy" alt="CueLevel's Edit mode: a zoomable waveform with Even out's sections labelled +6.5 dB, −4.0 dB and +7.0 dB, a fader, and trim and fade controls."></figure>
+      <figure class="rv"><picture><source media="(max-width: 700px)" srcset="shots/edit-host-m.webp" width="1240" height="560"><img src="shots/edit-host.webp" width="2470" height="923" loading="lazy" alt="CueLevel's Edit mode: a zoomable waveform with Even out's sections labelled +6.5 dB, −4.0 dB and +7.0 dB, a fader, and trim and fade controls."></picture></figure>
       <div class="copy" style="display:grid;gap:18px">
         <h3 class="rv" style="font-size:clamp(1.6rem,2.6vw,2.2rem);font-stretch:118%">Or take the fader yourself.</h3>
         <p class="rv muted">Edit mode is a clip gain editor. Drag a section up or down, trim the silence, set fades, mute a cough, drop a marker. Every change shows its value in dB, and undo goes all the way back.</p>
@@ -423,8 +424,7 @@ footer .tm{flex-basis:100%;max-width:60em;font-size:.78rem;color:var(--muted)}
         </div>
         <div class="scope">
           <div class="lbl"><span>Now playing <b id="nowName">Nothing yet</b></span><span class="num" id="nowLevel">— dB</span></div>
-          <canvas id="scope" aria-label="Live level meter for the demo"></canvas>
-          <div class="lbl"><span>Quiet</span><span>Target</span><span>Hot</span></div>
+          <div class="plot"><canvas id="scope" aria-label="Live level meter for the demo"></canvas></div>
         </div>
       </div>
     </div>
@@ -449,8 +449,8 @@ footer .tm{flex-basis:100%;max-width:60em;font-size:.78rem;color:var(--muted)}
       <h2 class="rv">From folder to PA in three steps.</h2>
       <div class="steps">
         <div class="step rv"><figure><img src="shots/step-drop.webp" width="1141" height="459" loading="lazy" alt="CueLevel's start screen: add your cues, check the plan, level and deliver."></figure><h3><span class="k">1</span>Drop the show</h3><p>Drag the cue folder in. Every file is measured as it arrives.</p></div>
-        <div class="step rv"><figure><img src="shots/step-plan.webp" width="274" height="429" loading="lazy" alt="The plan panel: trim silence, even out loud and quiet stretches, bring to −18 LUFS, with predicted loudness and peak."></figure><h3><span class="k">2</span>Check the plan</h3><p>See what will change in each cue, and why. Untick anything you don't want.</p></div>
-        <div class="step rv"><figure><img src="shots/step-result.webp" width="274" height="299" loading="lazy" alt="The result panel: levelled, evened out 9 stretches, gain +3.9 dB, and the saved file."></figure><h3><span class="k">3</span>Level and play</h3><p>Press Level all. The copies are in your Levelled folder, ready for playback.</p></div>
+        <div class="step rv"><figure><img src="shots/step-plan.webp" width="812" height="720" loading="lazy" alt="The host cue measured at −21.6 LUFS, going to −18.0, with the stretches Even out will change marked on the waveform, one of them +6.5 dB."></figure><h3><span class="k">2</span>Check the plan</h3><p>See each cue’s loudness now and after, and every stretch Even out will change.</p></div>
+        <div class="step rv"><figure><img src="shots/step-result.webp" width="670" height="730" loading="lazy" alt="The result panel: levelled, evened out 9 stretches, gain +3.9 dB, and the saved file."></figure><h3><span class="k">3</span>Level and play</h3><p>Press Level all. The copies are in your Levelled folder, ready for playback.</p></div>
       </div>
     </div>
   </section>
@@ -679,7 +679,7 @@ const CUES = [{"n":"01","name":"Walk-in music","dur":"00:55","kind":"WAV","src":
     stopAt = t0 + DUR * buffers.length; meter(an, t0);
   });
   let nodes = [];
-  function stopAll() { nodes.forEach(n => { try { n.src.stop(); } catch (e) {} }); nodes = []; playing = false; playBtn.querySelector('span').textContent = 'Play the show'; chips.forEach(c => c.classList.remove('now')); nowName.textContent = 'Nothing yet'; }
+  function stopAll() { nodes.forEach(n => { try { n.src.stop(); } catch (e) {} }); nodes = []; playing = false; playBtn.querySelector('span').textContent = 'Play the show'; chips.forEach(c => c.classList.remove('now')); nowName.textContent = '—'; }
   function meter(an, t0) {
     const g = scope.getContext('2d'), buf = new Float32Array(an.fftSize), hist = [];
     const loop = () => {
@@ -695,13 +695,15 @@ const CUES = [{"n":"01","name":"Walk-in music","dur":"00:55","kind":"WAV","src":
   }
   function drawScope(g, hist, db) {
     const dpr = Math.min(2, devicePixelRatio || 1), W = scope.clientWidth, H = scope.clientHeight;
-    if (scope.width !== Math.round(W * dpr)) { scope.width = Math.round(W * dpr); scope.height = Math.round(H * dpr); }
+    if (scope.width !== Math.round(W * dpr) || scope.height !== Math.round(H * dpr)) { scope.width = Math.round(W * dpr); scope.height = Math.round(H * dpr); }
     g.setTransform(dpr, 0, 0, dpr, 0, 0); g.clearRect(0, 0, W, H);
-    const y = v => H - clamp((v + 50) / 50) * H, ty = y(TARGET_RMS);
-    g.fillStyle = 'rgba(79,209,139,.10)'; g.fillRect(0, y(TARGET_RMS + 1.5), W, y(TARGET_RMS - 1.5) - y(TARGET_RMS + 1.5));
-    g.strokeStyle = 'rgba(238,233,224,.5)'; g.setLineDash([4, 5]); g.beginPath(); g.moveTo(0, ty); g.lineTo(W, ty); g.stroke(); g.setLineDash([]);
-    const bw = W / 240;
+    const y = v => H - clamp((v + 50) / 50) * H, ty = y(TARGET_RMS), PW = W - 52;   // right gutter holds the axis labels
+    g.fillStyle = 'rgba(79,209,139,.10)'; g.fillRect(0, y(TARGET_RMS + 1.5), PW, y(TARGET_RMS - 1.5) - y(TARGET_RMS + 1.5));
+    g.strokeStyle = 'rgba(238,233,224,.5)'; g.setLineDash([4, 5]); g.beginPath(); g.moveTo(0, ty); g.lineTo(PW, ty); g.stroke(); g.setLineDash([]);
+    const bw = PW / 240;
     hist.forEach((v, i) => { if (v < -60) return; g.fillStyle = Math.abs(v - TARGET_RMS) <= 2.5 ? C.good : (v < TARGET_RMS ? C.quiet : C.hot); const yy = y(v); g.fillRect(i * bw, yy, Math.max(1, bw - .5), H - yy); });
+    g.font = '500 11px Geist, system-ui, sans-serif'; g.textAlign = 'right'; g.fillStyle = 'rgba(156,161,168,.9)';
+    g.fillText('Hot', W, 12); g.fillText('Target', W, ty + 4); g.fillText('Quiet', W, H - 2);
   }
   drawScope(scope.getContext('2d'), [], null);
 
