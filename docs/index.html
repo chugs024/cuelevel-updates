@@ -1,0 +1,748 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#121417">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="canonical" href="https://cuelevel.com/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="CueLevel">
+<meta property="og:title" content="CueLevel for Mac">
+<meta property="og:description" content="Every cue in your show at one loudness for the PA. Lossless, on your Mac.">
+<meta property="og:url" content="https://cuelevel.com/">
+<meta property="og:image" content="https://cuelevel.com/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<title>CueLevel for Mac</title>
+<meta name="description" content="CueLevel levels a show's audio and video cues to one loudness for the PA, losslessly, on your Mac.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,300..800&family=Geist:wght@300..700&display=swap">
+<style>
+/* Layout concept: one long graphite stage. The page behaves like CueLevel's own meter: colour only ever means level
+   (blue quiet, green on target, amber changed, red hot). Sticky scroll scenes level a real example show. */
+:root{
+  color-scheme: dark;
+  --bg:#121417; --panel:#191C20; --raised:#22262B; --field:#0E1013;
+  --line:#2A2E34; --line2:#3B4047;
+  --bone:#EEE9E0; --text:#CFCBC4; --muted:#9CA1A8; --dim:#70757C;
+  --quiet:#6CB6FF; --good:#4FD18B; --changed:#F2B544; --hot:#FF5D4E; --onGood:#0F2A1B;
+  --display:"Archivo","Helvetica Neue",Arial,sans-serif;
+  --body:"Geist",-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;
+  --ease-out:cubic-bezier(.22,1,.36,1); --ease-ui:cubic-bezier(.2,0,0,1);
+  --gutter:clamp(16px,4vw,48px); --max:1240px;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:auto}
+body{background:var(--bg);color:var(--text);font:400 17px/1.6 var(--body);-webkit-font-smoothing:antialiased;overflow-x:clip}
+a{color:inherit}
+img{display:block;max-width:100%;height:auto}
+.wrap{max-width:var(--max);margin-inline:auto;padding-inline:var(--gutter)}
+h1,h2,h3{font-family:var(--display);color:var(--bone);font-weight:600;margin:0;text-wrap:balance;font-stretch:118%}
+h2{font-size:clamp(2rem,4.6vw,3.6rem);line-height:1.02;letter-spacing:-.025em}
+h3{font-size:clamp(1.15rem,1.6vw,1.35rem);line-height:1.2;letter-spacing:-.01em;font-stretch:108%}
+p{margin:0}
+.lede{font-size:clamp(1.05rem,1.4vw,1.25rem);color:var(--text);max-width:36em}
+.muted{color:var(--muted)}
+.num{font-variant-numeric:tabular-nums}
+:focus-visible{outline:2px solid var(--good);outline-offset:3px;border-radius:6px}
+
+/* Buttons */
+.btn{display:inline-flex;align-items:center;gap:.6em;font:600 1rem/1 var(--body);text-decoration:none;border-radius:12px;padding:1rem 1.35rem;transition:transform .12s var(--ease-ui),background .2s var(--ease-ui)}
+.btn-primary{background:var(--good);color:var(--onGood)}
+.btn-primary:hover{background:#63DB9A}
+.btn-primary:active{transform:scale(.97)}
+.btn svg{width:1.05em;height:1.05em}
+.link{color:var(--bone);text-decoration:none;border-bottom:1px solid var(--line2);padding-bottom:2px;transition:border-color .2s}
+.link:hover{border-color:var(--bone)}
+
+/* Nav */
+.nav{position:fixed;inset:0 0 auto 0;z-index:50;padding-top:env(safe-area-inset-top,0px);transition:background .3s,border-color .3s;border-bottom:1px solid transparent}
+.nav.solid{background:color-mix(in srgb,var(--bg) 82%,transparent);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-color:var(--line)}
+.nav .wrap{display:flex;align-items:center;gap:28px;height:64px}
+.brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--bone);font:600 1.05rem var(--display);font-stretch:112%}
+.brand svg{width:26px;height:26px}
+.nav nav{display:flex;gap:24px;margin-left:auto;font-size:.92rem}
+.nav nav a{text-decoration:none;color:var(--muted);transition:color .2s}
+.nav nav a:hover{color:var(--bone)}
+.nav .btn{padding:.6rem .95rem;font-size:.9rem;border-radius:9px}
+@media (max-width:820px){.nav nav{display:none}.nav .btn{margin-left:auto}}
+
+/* Hero (sticky levelling scene) */
+.hero{position:relative;height:250vh}
+.hero .stage{position:sticky;top:0;min-height:100svh;display:grid;align-items:center;padding-block:96px 40px}
+.hero-grid{display:grid;grid-template-columns:minmax(0,5.4fr) minmax(0,6.6fr);gap:clamp(28px,4vw,64px);align-items:center}
+.hero h1{font-size:clamp(2.5rem,4.7vw,4.7rem);line-height:.96;letter-spacing:-.035em;font-stretch:122%;font-weight:640}
+.hero h1 .line{display:block;overflow:hidden;padding-bottom:.04em;white-space:nowrap}
+.hero h1 .line>span{display:block}
+.hero .lede{margin-top:26px}
+.cta-row{display:flex;flex-wrap:wrap;align-items:center;gap:22px;margin-top:34px}
+.meta{margin-top:18px;font-size:.86rem;color:var(--muted)}
+.show{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:18px 18px 12px;min-width:0}
+.show-head{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:6px 18px;padding:2px 6px 14px;border-bottom:1px solid var(--line)}
+.show-head b{color:var(--bone);font-weight:600}
+.spread{font-size:.86rem;color:var(--muted)}
+.spread .v{font:600 1rem var(--display);font-stretch:118%;color:var(--bone)}
+.cues{list-style:none;margin:0;padding:0}
+.cue{display:grid;grid-template-columns:26px minmax(0,1.25fr) minmax(0,2fr) 92px 104px;align-items:center;gap:14px;padding:11px 6px;border-bottom:1px solid var(--line)}
+.cue:last-child{border-bottom:0}
+.cue .n{color:var(--dim);font-size:.8rem}
+.cue .nm{min-width:0}
+.cue .nm b{display:block;color:var(--bone);font-weight:500;font-size:.92rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cue .nm span{font-size:.76rem;color:var(--dim)}
+.cue canvas{width:100%;height:38px;display:block}
+.read{text-align:right;line-height:1.1}
+.read b{font:600 1.15rem var(--display);font-stretch:118%;color:var(--bone);font-variant-numeric:tabular-nums}
+.read .d{display:block;font-size:.74rem;color:var(--muted);font-variant-numeric:tabular-nums}
+.track{grid-column:3;grid-row:2;position:relative;height:10px;margin-top:-4px}
+.track::before{content:"";position:absolute;inset:4px 0;border-radius:2px;background:var(--line)}
+.track .tgt{position:absolute;top:0;bottom:0;width:2px;background:var(--bone);opacity:.6;left:55%}
+.track .dot{position:absolute;top:1px;left:0;width:8px;height:8px;border-radius:50%;background:var(--quiet);will-change:transform}
+.state{font-size:.78rem;font-weight:600;text-align:right;color:var(--muted);white-space:nowrap}
+.state.good{color:var(--good)} .state.changed{color:var(--changed)}
+.hint{display:flex;align-items:center;gap:10px;margin-top:16px;font-size:.84rem;color:var(--muted);transition:opacity .4s}
+.hint i{display:block;width:1px;height:26px;background:linear-gradient(var(--muted),transparent)}
+@media (max-width:980px){
+  .hero{height:auto}
+  .hero .stage{position:relative;min-height:0;padding-block:110px 56px}
+  .hero-grid{grid-template-columns:1fr}
+  .hint{display:none}
+}
+@media (max-width:560px){
+  .cue{grid-template-columns:22px minmax(0,1fr) 86px;gap:10px}
+  .cue canvas{grid-column:2 / 4;grid-row:2}
+  .cue .state{display:none}
+  .track{display:none}
+}
+
+/* Words that light up */
+.words{height:200vh;position:relative}
+.words .stage{position:sticky;top:0;min-height:100svh;display:grid;align-items:center}
+.words p{font:500 clamp(1.8rem,4.2vw,3.5rem)/1.16 var(--display);font-stretch:108%;letter-spacing:-.02em;color:var(--bone);max-width:22ch}
+.words .w{opacity:.16;transition:opacity .25s linear}
+.words .follow{margin-top:34px;font-size:clamp(1.05rem,1.4vw,1.25rem);color:var(--muted);max-width:34em}
+
+/* App reveal */
+.app{height:330vh;position:relative}
+.app .stage{position:sticky;top:0;height:100svh;display:grid;grid-template-rows:auto 1fr auto;align-content:center;gap:18px;padding-block:84px 28px;overflow:hidden}
+.app-head{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:end;gap:12px 40px}
+.app-head p{max-width:30em;color:var(--muted)}
+.screen-wrap{perspective:1600px;display:grid;place-items:center;min-height:0}
+.screen{position:relative;width:min(100%,calc((100svh - 330px) * 1.684));aspect-ratio:1415/840;border-radius:14px;overflow:hidden;box-shadow:0 0 0 1px var(--line2),0 40px 120px -40px #000;transform-origin:50% 0;will-change:transform}
+.screen img{width:100%;height:100%}
+.screen svg{position:absolute;inset:0;width:100%;height:100%}
+.callouts{position:relative;min-height:5.6em;width:100%}
+.app .stage>.wrap{width:100%}
+.callout{position:absolute;inset:0 auto auto 0;width:min(100%,44em);display:grid;grid-template-columns:auto 1fr;gap:4px 14px;opacity:0;transform:translateY(10px);filter:blur(6px);transition:opacity .35s var(--ease-out),transform .45s var(--ease-out),filter .35s}
+.callout.on{opacity:1;transform:none;filter:none}
+.callout .k{grid-row:span 2;font:600 .8rem var(--display);font-stretch:118%;color:var(--bg);background:var(--bone);border-radius:50%;width:26px;height:26px;display:grid;place-items:center;margin-top:3px}
+.callout h3{font-size:1.25rem}
+.callout p{color:var(--muted);font-size:.98rem}
+@media (max-width:980px){
+  .app{height:auto}
+  .app .stage{position:relative;height:auto;padding-block:72px}
+  .screen{width:100%;transform:none!important}
+  .screen svg{display:none}
+  .callouts{min-height:0;display:grid;gap:22px}
+  .callout{position:relative;opacity:1;transform:none;filter:none}
+}
+
+/* Even out */
+.section{padding-block:clamp(96px,14vh,160px)}
+.split{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:clamp(28px,5vw,80px);align-items:center}
+.split .copy{display:grid;gap:22px}
+.compare{position:relative;border-radius:14px;overflow:hidden;box-shadow:0 0 0 1px var(--line2);background:var(--panel);aspect-ratio:772/186;touch-action:pan-y}
+.compare img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.compare .after{clip-path:inset(0 0 0 var(--cut,50%))}
+.compare .bar{position:absolute;top:0;bottom:0;left:var(--cut,50%);width:2px;background:var(--bone);transform:translateX(-1px)}
+.compare .bar::after{content:"";position:absolute;top:50%;left:50%;width:34px;height:34px;margin:-17px 0 0 -17px;border-radius:50%;background:var(--bone);box-shadow:0 6px 18px #0008}
+.compare .bar svg{position:absolute;top:50%;left:50%;width:18px;height:18px;margin:-9px 0 0 -9px;z-index:1;color:var(--bg)}
+.compare input{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:ew-resize;margin:0}
+.compare .tag{position:absolute;bottom:10px;font-size:.75rem;font-weight:600;padding:4px 8px;border-radius:6px;background:#000a;color:var(--bone)}
+.compare .tag.l{left:10px}.compare .tag.r{right:10px}
+.cap{margin-top:12px;font-size:.84rem;color:var(--muted)}
+.editor{margin-top:clamp(64px,10vh,110px);display:grid;grid-template-columns:minmax(0,7fr) minmax(0,5fr);gap:clamp(28px,5vw,80px);align-items:center}
+.editor figure{margin:0;border-radius:14px;overflow:hidden;box-shadow:0 0 0 1px var(--line2)}
+.editor figure img{width:100%}
+@media (max-width:900px){.split,.editor{grid-template-columns:1fr}.editor figure{order:2}}
+
+/* Proof rows */
+.rows{margin-top:56px;border-top:1px solid var(--line)}
+.row{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:clamp(24px,5vw,80px);padding-block:44px;border-bottom:1px solid var(--line);align-items:center}
+.row h3{font-size:clamp(1.4rem,2.4vw,2rem);font-stretch:116%}
+.row .why{margin-top:10px;color:var(--muted);max-width:30em}
+.big{font:600 clamp(3rem,7vw,6rem)/1 var(--display);font-stretch:124%;letter-spacing:-.03em;color:var(--good);font-variant-numeric:tabular-nums}
+.hash{font:500 clamp(.8rem,1.35vw,1.02rem)/1.5 ui-monospace,"SF Mono",Menlo,monospace;color:var(--bone);word-break:break-all}
+.hash dt{font:500 .78rem var(--body);color:var(--muted);margin-top:12px}
+.hash dt:first-child{margin-top:0}
+.hash dd{margin:2px 0 0}
+.hash .match{display:inline-flex;align-items:center;gap:8px;margin-top:16px;font:600 .9rem var(--body);color:var(--good)}
+.pill{display:inline-flex;align-items:center;gap:8px;font:600 1.05rem var(--body);color:var(--good)}
+.pill svg{width:20px;height:20px}
+@media (max-width:860px){.row{grid-template-columns:1fr}}
+
+/* Listen */
+.listen{background:var(--panel);border-block:1px solid var(--line)}
+.player{margin-top:44px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(20px,4vw,56px);align-items:stretch}
+.deck{display:grid;gap:10px;align-content:start}
+.track-chip{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:14px;padding:14px 16px;border-radius:12px;background:var(--raised);border:1px solid var(--line);transition:border-color .2s,background .2s}
+.track-chip.now{border-color:var(--bone)}
+.track-chip .ix{font-size:.8rem;color:var(--dim);font-variant-numeric:tabular-nums}
+.track-chip b{color:var(--bone);font-weight:500}
+.track-chip .lv{font:600 .95rem var(--display);font-stretch:118%;font-variant-numeric:tabular-nums}
+.controls{display:flex;flex-wrap:wrap;gap:18px;align-items:center;margin-top:8px}
+.btn-ghost{background:var(--bone);color:var(--bg)}
+.btn-ghost:hover{background:#fff}
+.switch{display:inline-flex;align-items:center;gap:12px;cursor:pointer;font-weight:500;color:var(--bone);user-select:none}
+.switch input{position:absolute;opacity:0;width:1px;height:1px}
+.switch .t{width:46px;height:28px;border-radius:999px;background:var(--line2);position:relative;transition:background .2s}
+.switch .t::after{content:"";position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:var(--bone);transition:transform .25s var(--ease-out)}
+.switch input:checked+.t{background:var(--good)}
+.switch input:checked+.t::after{transform:translateX(18px);background:var(--onGood)}
+.switch input:focus-visible+.t{outline:2px solid var(--good);outline-offset:3px}
+.scope{background:var(--field);border:1px solid var(--line);border-radius:14px;padding:18px;display:grid;grid-template-rows:auto 1fr auto;gap:12px;min-height:300px}
+.scope canvas{width:100%;height:100%;min-height:180px}
+.scope .lbl{display:flex;justify-content:space-between;font-size:.84rem;color:var(--muted)}
+.scope .lbl b{color:var(--bone);font-weight:500}
+@media (max-width:860px){.player{grid-template-columns:1fr}}
+
+/* Features */
+.feats{margin-top:56px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:clamp(28px,5vw,80px);border-top:1px solid var(--line)}
+.feat{padding:28px 0;border-bottom:1px solid var(--line);display:grid;gap:8px}
+.feat p{color:var(--muted);max-width:32em}
+.feat .ic{width:28px;height:28px;color:var(--bone);margin-bottom:6px}
+@media (max-width:760px){.feats{grid-template-columns:1fr}}
+
+/* Steps */
+.steps{margin-top:56px;display:grid;grid-template-columns:1.5fr 1fr 1fr;gap:20px;align-items:start}
+.step{display:grid;gap:14px}
+.step figure{margin:0;border-radius:12px;overflow:hidden;box-shadow:0 0 0 1px var(--line2);background:var(--panel)}
+.step .k{font:600 .85rem var(--display);font-stretch:118%;color:var(--bg);background:var(--bone);width:28px;height:28px;border-radius:50%;display:grid;place-items:center}
+.step h3{display:flex;gap:12px;align-items:center}
+.step p{color:var(--muted);font-size:.95rem}
+@media (max-width:900px){.steps{grid-template-columns:1fr}.step figure{max-width:420px}}
+
+/* Specs */
+.specs{margin-top:44px;width:100%;border-collapse:collapse;font-size:.98rem}
+.specs th,.specs td{text-align:left;padding:16px 0;border-bottom:1px solid var(--line);vertical-align:top}
+.specs th{width:32%;color:var(--muted);font-weight:500;padding-right:24px}
+.specs td{color:var(--bone)}
+.table-wrap{overflow-x:auto}
+
+/* Close */
+.close{text-align:left;padding-block:clamp(120px,18vh,200px) clamp(80px,12vh,120px)}
+.close h2{font-size:clamp(2.4rem,6vw,5rem);max-width:13ch}
+.close .cta-row{margin-top:40px}
+footer{border-top:1px solid var(--line);padding-block:32px 48px;font-size:.84rem;color:var(--muted)}
+footer .wrap{display:flex;flex-wrap:wrap;gap:12px 28px;justify-content:space-between}
+
+
+/* Film */
+.film-sec{padding-block:clamp(40px,8vh,96px)}
+.film{position:relative;margin:0}
+.film video{width:100%;height:auto;border-radius:16px;box-shadow:0 0 0 1px var(--line2);background:var(--panel);display:block}
+.film figcaption{margin-top:12px;font-size:.84rem;color:var(--muted)}
+.film-btn{position:absolute;right:14px;top:14px;width:40px;height:40px;border-radius:50%;border:0;background:#000a;color:var(--bone);display:grid;place-items:center;cursor:pointer}
+.film-btn svg{width:16px;height:16px}
+
+/* Reveal on enter (JS adds .pre, then .in) */
+.pre .rv{opacity:0;transform:translateY(16px)}
+.rv{transition:opacity .6s var(--ease-out),transform .8s var(--ease-out)}
+.pre .rv.in{opacity:1;transform:none}
+.pre .mask>span{transform:translateY(105%)}
+.mask>span{transition:transform .95s var(--ease-out)}
+.pre .mask.in>span{transform:none}
+
+@media (prefers-reduced-motion:reduce){
+  .hero,.words,.app{height:auto}
+  .hero .stage,.words .stage,.app .stage{position:relative;min-height:0;height:auto;padding-block:110px 64px}
+  .words .w{opacity:1}
+  .screen{transform:none!important}
+  .screen svg{display:none}
+  .callouts{min-height:0;display:grid;gap:22px}
+  .callout{position:relative;opacity:1;transform:none;filter:none}
+  .pre .rv,.pre .mask>span{opacity:1;transform:none}
+  .hint{display:none}
+  *{transition:none!important}
+}
+</style>
+</head>
+<body>
+<header class="nav" id="nav">
+  <div class="wrap">
+    <a class="brand" href="#top" aria-label="CueLevel home">
+      <svg viewBox="0 0 28 28" aria-hidden="true"><rect x="3" y="10" width="2.4" height="8" rx="1.2" fill="#EEE9E0"/><rect x="7.4" y="4" width="2.4" height="20" rx="1.2" fill="#EEE9E0"/><rect x="11.8" y="8" width="2.4" height="12" rx="1.2" fill="#EEE9E0"/><rect x="16.2" y="9" width="2.4" height="10" rx="1.2" fill="#4FD18B"/><rect x="20.6" y="9" width="2.4" height="10" rx="1.2" fill="#4FD18B"/><rect x="25" y="9" width="2.4" height="10" rx="1.2" fill="#4FD18B"/></svg>
+      CueLevel
+    </a>
+    <nav aria-label="Sections"><a href="#how">How it works</a><a href="#lossless">Lossless</a><a href="#listen">Listen</a><a href="#specs">Specs</a></nav>
+    <a class="btn btn-primary" href="https://github.com/chugs024/cuelevel-updates/releases/latest" rel="noopener">Download</a>
+  </div>
+</header>
+
+<main id="top">
+  <section class="hero" id="hero" aria-label="CueLevel">
+    <div class="stage">
+      <div class="wrap hero-grid">
+        <div>
+          <h1><span class="line mask"><span>Every cue</span></span><span class="line mask"><span>lands at the</span></span><span class="line mask"><span>same loudness.</span></span></h1>
+          <p class="lede rv">CueLevel measures your show's audio and video cues and brings each one to −18&nbsp;LUFS for the PA. One exact gain change per cue. Nothing else in the file is touched.</p>
+          <div class="cta-row rv">
+            <a class="btn btn-primary" href="https://github.com/chugs024/cuelevel-updates/releases/latest" rel="noopener">
+              <svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M10 3v10m0 0 4-4m-4 4-4-4M4 16h12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              Download for Mac</a>
+            <a class="link" href="#how">See how it works</a>
+          </div>
+          <p class="meta rv">Free · Version 2.0.1 · macOS 13 or later on Apple silicon · 13 MB</p>
+        </div>
+        <div class="show rv" aria-label="An example show of seven cues, before and after levelling">
+          <div class="show-head"><span><b>Example show</b> · 7 cues measured by CueLevel</span><span class="spread">Loudness spread <span class="v num" id="spread">28.0</span> LU</span></div>
+          <ol class="cues" id="cues"></ol>
+          <div class="hint" id="hint"><i></i>Scroll to level the show</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="words" id="problem" aria-label="The problem">
+    <div class="stage"><div class="wrap">
+      <p id="manifesto">Cue 12 is a whisper. Cue 13 takes the roof off. Between them, the person at the desk is riding a fader instead of watching the stage.</p>
+      <p class="follow rv">CueLevel fixes the files before the show, so every cue plays at the level you set at soundcheck.</p>
+    </div></div>
+  </section>
+
+
+  <section class="film-sec" id="film" aria-label="The 16-second film">
+    <div class="wrap">
+      <figure class="film rv">
+        <video id="filmVid" muted playsinline loop preload="metadata" poster="film/poster.webp" width="1280" height="720">
+          <source src="film/cuelevel-film-web.webm" type="video/webm">
+          <source src="film/cuelevel-film-web.mp4" type="video/mp4">
+        </video>
+        <button class="film-btn" id="filmBtn" type="button" aria-label="Pause the film"><svg viewBox="0 0 20 20" aria-hidden="true"><path id="filmIcon" d="M6 4h3v12H6zM11 4h3v12h-3z" fill="currentColor"/></svg></button>
+        <figcaption>The example show, levelled. Every frame is drawn from the real measurements and screens above.</figcaption>
+      </figure>
+    </div>
+  </section>
+  <section class="app" id="how" aria-label="How it works">
+    <div class="stage">
+      <div class="wrap app-head">
+        <h2 class="rv">The whole show on one&nbsp;screen.</h2>
+        <p class="rv">Your cues on the left, the cue in the middle, and what CueLevel will do on the right, before it does anything.</p>
+      </div>
+      <div class="wrap screen-wrap">
+        <div class="screen" id="screen">
+          <img src="shots/plan-host.webp" width="1415" height="840" alt="CueLevel showing seven example cues, the host cue's loudness readout at −21.6 going to −18.0 LUFS, its waveform, and the plan: even out loud and quiet stretches, then bring to −18 LUFS.">
+          <svg viewBox="0 0 1415 840" preserveAspectRatio="none" aria-hidden="true">
+            <defs><mask id="hole"><rect width="1415" height="840" fill="#fff"/><rect id="holeRect" x="0" y="0" width="1415" height="840" rx="14" fill="#000"/></mask></defs>
+            <rect width="1415" height="840" fill="#0B0C0E" fill-opacity=".62" mask="url(#hole)"/>
+            <rect id="ring" x="0" y="0" width="1415" height="840" rx="14" fill="none" stroke="#EEE9E0" stroke-width="2.5" vector-effect="non-scaling-stroke" opacity="0"/>
+          </svg>
+        </div>
+      </div>
+      <div class="wrap callouts" id="callouts">
+        <div class="callout"><span class="k">1</span><h3>Your show, measured on arrival</h3><p>Drop audio or video in. Each cue shows its length, its loudness and a dot on the ruler, coloured by level.</p></div>
+        <div class="callout"><span class="k">2</span><h3>Where it is, and where it lands</h3><p>The readout shows the cue now and after levelling, against your −18 LUFS target and the range your good cues sit in.</p></div>
+        <div class="callout"><span class="k">3</span><h3>The plan, before anything changes</h3><p>Every step CueLevel will take, with the reason and a tick box to skip it. Press Level this cue and the copy lands in your Levelled folder.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="evenout" aria-label="Even out">
+    <div class="wrap split">
+      <div class="copy">
+        <h2 class="rv">A quiet guest, brought into line.</h2>
+        <p class="lede rv">Even out finds stretches more than 3&nbsp;dB louder or quieter than the rest of the cue and turns them back in the nearest pause. No fades, no pumping, no compression. Songs are left as they are.</p>
+      </div>
+      <div class="rv">
+        <div class="compare" id="compare" style="--cut:62%">
+          <img src="shots/original-edits-host-wave.webp" width="772" height="186" alt="Original: the guest's stretches sit well below the host's.">
+          <img class="after" src="shots/levelled-host-wave.webp" width="772" height="186" alt="Levelled: host and guest at the same level.">
+          <span class="tag l">Original, with Even out's sections</span><span class="tag r">Levelled</span>
+          <div class="bar" aria-hidden="true"><svg viewBox="0 0 18 18" fill="none"><path d="M6 4 2 9l4 5M12 4l4 5-4 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <label class="sr" for="cut" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)">Compare original and levelled</label>
+          <input id="cut" type="range" min="0" max="100" value="62" step="0.5">
+        </div>
+        <p class="cap">Real CueLevel output for the example host and guest cue: 9 stretches evened, then +3.9&nbsp;dB to −18.0&nbsp;LUFS.</p>
+      </div>
+    </div>
+    <div class="wrap editor">
+      <figure class="rv"><img src="shots/edit-host.webp" width="1415" height="840" loading="lazy" alt="CueLevel's Edit mode: a zoomable waveform with Even out's sections labelled +6.5 dB, −4.0 dB and +7.0 dB, a fader, and trim and fade controls."></figure>
+      <div class="copy" style="display:grid;gap:18px">
+        <h3 class="rv" style="font-size:clamp(1.6rem,2.6vw,2.2rem);font-stretch:118%">Or take the fader yourself.</h3>
+        <p class="rv muted">Edit mode is a clip gain editor. Drag a section up or down, trim the silence, set fades, mute a cough, drop a marker. Every change shows its value in dB, and undo goes all the way back.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="lossless" aria-label="Lossless">
+    <div class="wrap">
+      <h2 class="rv" style="max-width:15ch">Lossless, and you can check.</h2>
+      <div class="rows">
+        <div class="row rv">
+          <div><h3>One exact gain change.</h3><p class="why">No compression, no limiting, no resampling. The levelled file is the original, made louder or quieter.</p></div>
+          <div><div class="big" data-count="3.9" data-prefix="+" data-suffix=" dB">+3.9 dB</div><p class="cap">The host cue above, raised from −21.6 to −18.0 LUFS after evening out.</p></div>
+        </div>
+        <div class="row rv">
+          <div><h3>The picture is copied bit for bit.</h3><p class="why">Video files keep their picture, timecode and extra audio tracks. Only the first audio track is levelled.</p></div>
+          <dl class="hash" id="hash"><dt>Video stream checksum, original</dt><dd data-hash="9b4f971056f90d3da174246fe98b23e1">9b4f971056f90d3da174246fe98b23e1</dd><dt>Video stream checksum, levelled copy</dt><dd data-hash="9b4f971056f90d3da174246fe98b23e1">9b4f971056f90d3da174246fe98b23e1</dd><dd class="match"><svg viewBox="0 0 20 20" width="18" height="18" fill="none" aria-hidden="true"><path d="m5 10 3.5 3.5L15 7" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Identical. MD5 from our own test of a levelled MP4.</dd></dl>
+        </div>
+        <div class="row rv">
+          <div><h3>Already good is left alone.</h3><p class="why">A cue within 1 LU of the target, with nothing uneven, is saved as an exact copy, so the folder still has every cue.</p></div>
+          <div><span class="pill"><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><circle cx="10" cy="10" r="9" fill="currentColor"/><path d="m6 10 2.8 2.8L14 7.5" stroke="#0F2A1B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Already good</span><p class="cap">The example sponsor reel: −17.9 LUFS, peaks −6.6 dBTP. Nothing was changed.</p></div>
+        </div>
+        <div class="row rv">
+          <div><h3>Peaks stay under the ceiling.</h3><p class="why">If a cue can't reach the target without its peaks going over −1 dBTP, it stays quieter and tells you by how much. Nothing is squashed to make it fit.</p></div>
+          <div><div class="big" style="color:var(--changed)" data-count="2.2" data-suffix=" dB under">2.2 dB under</div><p class="cap">The example piano cue, kept at −20.3 LUFS so its loudest note stays clean.</p></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section listen" id="listen" aria-label="Listen">
+    <div class="wrap">
+      <h2 class="rv">Hear what it does.</h2>
+      <p class="lede rv" style="margin-top:20px">Four short cues, made in your browser at four very different levels. Play the show, then switch levelling on and play it again.</p>
+      <div class="player">
+        <div class="deck">
+          <div id="tracks" class="deck"></div>
+          <div class="controls">
+            <button class="btn btn-ghost" id="play" type="button"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M6 4.5v11l9-5.5z" fill="currentColor"/></svg><span>Play the show</span></button>
+            <label class="switch"><input type="checkbox" id="levelOn"><span class="t" aria-hidden="true"></span>Level the cues</label>
+          </div>
+          <p class="cap">The app measures loudness in LUFS (EBU R&nbsp;128). This demo matches RMS levels in your browser, which is close enough to hear the point.</p>
+        </div>
+        <div class="scope">
+          <div class="lbl"><span>Now playing <b id="nowName">Nothing yet</b></span><span class="num" id="nowLevel">— dB</span></div>
+          <canvas id="scope" aria-label="Live level meter for the demo"></canvas>
+          <div class="lbl"><span>Quiet</span><span>Target</span><span>Hot</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="features" aria-label="Features">
+    <div class="wrap">
+      <h2 class="rv">Built for the person at the desk.</h2>
+      <div class="feats">
+        <div class="feat rv"><svg class="ic" viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h7l2 3h11v11H4z"/><path d="M14 14v6m-3-3 3 3 3-3"/></svg><h3>Drop a whole show</h3><p>Drop a folder of audio and video. Levelled copies land in Desktop › CueLevel › Levelled, named after the original with _LVL-18.</p></div>
+        <div class="feat rv"><svg class="ic" viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M3 14h4l3-7 4 14 3-9 2 2h6"/></svg><h3>Checks the source</h3><p>Clipping, DC offset, left and right out of phase, silence at the ends and extra audio tracks, explained in plain words.</p></div>
+        <div class="feat rv"><svg class="ic" viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M8 20V8l12-3v12"/><circle cx="6" cy="20" r="2.5"/><circle cx="18" cy="17" r="2.5"/></svg><h3>Knows a song from a speech</h3><p>Each cue is Voice, Music or Music + voice. Music is never evened out, and cues that play straight through like a song are left as they are.</p></div>
+        <div class="feat rv"><svg class="ic" viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 14 5 5 11-11"/></svg><h3>Learns what good sounds like</h3><p>Mark finished cues as good. CueLevel keeps their measurements and checks every new cue against them.</p></div>
+        <div class="feat rv"><svg class="ic" viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="6" width="16" height="16" rx="2"/><path d="m19 11 6-3v12l-6-3"/></svg><h3>Video stays video</h3><p>MOV and MP4 keep their picture, timecode and other audio tracks untouched. The levelled copy plays in Resolume, QLab or ProPresenter like the original.</p></div>
+        <div class="feat rv"><svg class="ic" viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="12" width="18" height="12" rx="2"/><path d="M9 12V8a5 5 0 0 1 10 0v4"/></svg><h3>Stays on your Mac</h3><p>Nothing is uploaded and there's no account. Updates install themselves after you say yes.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="steps" aria-label="Three steps" style="padding-top:0">
+    <div class="wrap">
+      <h2 class="rv">From folder to PA in three steps.</h2>
+      <div class="steps">
+        <div class="step rv"><figure><img src="shots/step-drop.webp" width="1141" height="459" loading="lazy" alt="CueLevel's start screen: add your cues, check the plan, level and deliver."></figure><h3><span class="k">1</span>Drop the show</h3><p>Drag the cue folder in. Every file is measured as it arrives.</p></div>
+        <div class="step rv"><figure><img src="shots/step-plan.webp" width="274" height="429" loading="lazy" alt="The plan panel: trim silence, even out loud and quiet stretches, bring to −18 LUFS, with predicted loudness and peak."></figure><h3><span class="k">2</span>Check the plan</h3><p>See what will change in each cue, and why. Untick anything you don't want.</p></div>
+        <div class="step rv"><figure><img src="shots/step-result.webp" width="274" height="299" loading="lazy" alt="The result panel: levelled, evened out 9 stretches, gain +3.9 dB, and the saved file."></figure><h3><span class="k">3</span>Level and play</h3><p>Press Level all. The copies are in your Levelled folder, ready for playback.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="specs" aria-label="Specs" style="padding-top:0">
+    <div class="wrap">
+      <h2 class="rv">Specs.</h2>
+      <div class="table-wrap rv">
+        <table class="specs">
+          <tr><th scope="row">Loudness target</th><td>−18 LUFS by default, any target from −30 to −12 LUFS</td></tr>
+          <tr><th scope="row">Peak ceiling</th><td>−1 dBTP by default, from −6 to −1 dBTP</td></tr>
+          <tr><th scope="row">Measurement</th><td>EBU R 128 loudness and true peak (ITU-R BS.1770)</td></tr>
+          <tr><th scope="row">Files in</th><td>WAV, AIFF, MP3, M4A, FLAC, MP4, MOV and most other audio and video files, or whole folders</td></tr>
+          <tr><th scope="row">Files out</th><td>Uncompressed WAV at the source sample rate; video as MOV with the original picture copied</td></tr>
+          <tr><th scope="row">Processing</th><td>On your Mac. No account, no uploads</td></tr>
+          <tr><th scope="row">Requires</th><td>macOS 13 Ventura or later on a Mac with Apple silicon</td></tr>
+          <tr><th scope="row">Price</th><td>Free</td></tr>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section class="close wrap" aria-label="Download">
+    <h2 class="rv">Level your next show before soundcheck.</h2>
+    <div class="cta-row rv">
+      <a class="btn btn-primary" href="https://github.com/chugs024/cuelevel-updates/releases/latest" rel="noopener"><svg viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M10 3v10m0 0 4-4m-4 4-4-4M4 16h12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Download for Mac</a>
+      <span class="muted">Free · 13 MB · macOS 13 or later on Apple silicon</span>
+    </div>
+  </section>
+</main>
+<footer><div class="wrap"><span>CueLevel 2.0.1. On this page, as in the app, colour only ever means level.</span><span>Includes FFmpeg under the LGPL. <a class="link" href="https://github.com/chugs024/cuelevel-updates/releases" rel="noopener">Release notes</a></span></div></footer>
+
+<script>
+const CUES = [{"n":"01","name":"Walk-in music","dur":"00:55","kind":"WAV","src":-22.6,"out":-18.0,"state":"Levelled","pk":[0.0,0.005,0.019,0.026,0.05,0.059,0.117,0.181,0.235,0.201,0.192,0.133,0.115,0.111,0.117,0.129,0.131,0.122,0.143,0.172,0.175,0.154,0.132,0.123,0.097,0.116,0.127,0.12,0.092,0.083,0.101,0.205,0.175,0.128,0.107,0.089,0.1,0.085,0.098,0.079,0.09,0.089,0.107,0.205,0.188,0.151,0.127,0.089,0.091,0.096,0.156,0.117,0.102,0.159,0.199,0.425,0.261,0.285,0.203,0.2,0.232,0.264,0.202,0.214,0.201,0.21,0.325,0.273,0.224,0.214,0.172,0.18,0.188,0.195,0.19,0.24,0.195,0.159,0.302,0.262,0.227,0.189,0.189,0.169,0.195,0.205,0.201,0.174,0.23,0.198,0.342,0.245,0.199,0.223,0.169,0.164,0.195,0.228,0.171,0.184,0.246,0.187,0.185,0.215,0.197,0.19,0.186,0.233,0.393,0.372,0.232,0.304,0.246,0.246,0.335,0.265,0.243,0.286,0.314,0.263,0.426,0.305,0.281,0.244,0.236,0.251,0.288,0.266,0.237,0.253,0.267,0.348,0.438,0.314,0.315,0.253,0.234,0.255,0.299,0.233,0.302,0.264,0.303,0.413,0.38,0.26,0.303,0.244,0.246,0.28,0.26,0.217,0.22,0.282,0.319,0.392,0.316,0.242,0.256,0.263,0.257,0.312,0.303,0.254,0.276,0.315,0.354,0.42,0.297,0.299,0.268,0.24,0.201,0.204,0.16,0.114,0.113,0.091,0.058,0.032],"po":[0.0,0.009,0.032,0.044,0.086,0.101,0.199,0.307,0.398,0.342,0.326,0.225,0.195,0.188,0.199,0.218,0.222,0.208,0.243,0.292,0.296,0.261,0.224,0.208,0.164,0.198,0.216,0.203,0.155,0.141,0.171,0.348,0.297,0.218,0.181,0.15,0.17,0.144,0.167,0.133,0.153,0.152,0.182,0.347,0.318,0.256,0.215,0.151,0.154,0.163,0.264,0.199,0.173,0.269,0.338,0.721,0.443,0.483,0.344,0.339,0.393,0.448,0.342,0.363,0.342,0.356,0.55,0.464,0.38,0.362,0.292,0.305,0.319,0.331,0.322,0.407,0.331,0.271,0.512,0.445,0.385,0.321,0.321,0.286,0.33,0.347,0.342,0.295,0.391,0.336,0.58,0.415,0.338,0.378,0.286,0.278,0.331,0.387,0.29,0.312,0.417,0.317,0.314,0.365,0.334,0.322,0.315,0.395,0.666,0.63,0.393,0.515,0.418,0.417,0.568,0.45,0.413,0.485,0.533,0.447,0.722,0.517,0.476,0.414,0.4,0.426,0.489,0.451,0.403,0.429,0.454,0.591,0.744,0.533,0.535,0.429,0.398,0.432,0.508,0.396,0.512,0.447,0.513,0.701,0.644,0.441,0.513,0.413,0.418,0.474,0.44,0.368,0.372,0.479,0.541,0.665,0.536,0.411,0.434,0.447,0.436,0.528,0.514,0.432,0.469,0.534,0.6,0.713,0.504,0.506,0.454,0.407,0.34,0.346,0.272,0.193,0.192,0.155,0.099,0.055]},{"n":"02","name":"Host welcome and guest","dur":"01:02","kind":"WAV","src":-21.6,"out":-18.0,"state":"Evened, levelled","pk":[0.389,0.443,0.422,0.464,0.667,0.373,0.466,0.53,0.464,0.225,0.792,0.783,0.762,0.682,0.561,0.584,0.375,0.66,0.31,0.538,0.476,0.575,0.36,0.658,0.414,0.448,0.444,0.725,0.523,0.468,0.364,0.753,0.261,0.563,0.458,0.469,0.398,0.468,0.416,0.589,0.0,0.066,0.135,0.133,0.193,0.117,0.176,0.139,0.187,0.106,0.15,0.123,0.176,0.138,0.157,0.12,0.168,0.157,0.165,0.143,0.182,0.178,0.11,0.139,0.117,0.109,0.17,0.188,0.116,0.136,0.103,0.147,0.088,0.175,0.113,0.181,0.124,0.145,0.107,0.147,0.114,0.181,0.056,0.153,0.147,0.154,0.103,0.134,0.0,0.657,0.737,0.485,0.484,0.555,0.593,0.702,0.695,0.344,0.5,0.497,0.708,0.408,0.42,0.299,0.47,0.355,0.557,0.528,0.665,0.327,0.559,0.389,0.587,0.511,0.804,0.032,0.704,0.503,0.53,0.375,0.495,0.0,0.42,0.399,0.0,0.188,0.152,0.196,0.184,0.122,0.133,0.192,0.151,0.0,0.119,0.155,0.188,0.128,0.159,0.129,0.18,0.113,0.051,0.104,0.175,0.122,0.159,0.13,0.116,0.072,0.131,0.105,0.175,0.118,0.076,0.241,0.612,0.488,0.608,0.441,0.542,0.023,0.443,0.29,0.438,0.446,0.55,0.405,0.619,0.468,0.325,0.129,0.618,0.286,0.471,0.361,0.5,0.532,0.332,0.0],"po":[0.613,0.698,0.665,0.731,0.626,0.35,0.437,0.711,0.731,0.355,0.663,0.655,0.637,0.57,0.469,0.489,0.591,1.04,0.489,0.848,0.474,0.572,0.358,0.654,0.412,0.446,0.442,0.721,0.52,0.465,0.537,1.187,0.411,0.888,0.586,0.494,0.419,0.737,0.656,0.929,0.0,0.221,0.449,0.444,0.642,0.39,0.585,0.462,0.622,0.353,0.501,0.409,0.586,0.459,0.522,0.399,0.561,0.525,0.551,0.478,0.606,0.594,0.366,0.462,0.388,0.363,0.567,0.627,0.385,0.452,0.344,0.489,0.293,0.583,0.378,0.604,0.412,0.484,0.355,0.49,0.381,0.602,0.186,0.511,0.489,0.514,0.344,0.446,0.0,0.616,0.692,0.456,0.455,0.521,0.556,0.659,0.652,0.342,0.497,0.783,1.116,0.643,0.663,0.472,0.74,0.353,0.554,0.525,0.661,0.325,0.556,0.386,0.584,0.508,0.8,0.032,0.7,0.501,0.836,0.591,0.78,0.0,0.662,0.629,0.0,0.664,0.537,0.692,0.65,0.431,0.47,0.676,0.532,0.0,0.42,0.548,0.663,0.451,0.56,0.454,0.634,0.397,0.179,0.366,0.617,0.431,0.561,0.459,0.408,0.255,0.463,0.372,0.278,0.187,0.12,0.38,0.965,0.768,0.957,0.695,0.854,0.036,0.698,0.457,0.69,0.702,0.867,0.639,0.975,0.737,0.512,0.204,0.973,0.451,0.742,0.569,0.787,0.839,0.523,0.0]},{"n":"03","name":"Sponsor reel","dur":"00:06","kind":"MP4","src":-17.9,"out":-17.9,"state":"Already good","pk":[0.173,0.176,0.204,0.214,0.192,0.218,0.252,0.285,0.25,0.243,0.246,0.216,0.28,0.333,0.249,0.288,0.341,0.228,0.27,0.334,0.248,0.266,0.257,0.279,0.274,0.214,0.25,0.27,0.272,0.278,0.309,0.194,0.195,0.276,0.226,0.297,0.331,0.324,0.304,0.29,0.291,0.356,0.314,0.287,0.244,0.251,0.236,0.31,0.294,0.257,0.222,0.301,0.269,0.272,0.263,0.331,0.27,0.384,0.315,0.233,0.343,0.241,0.247,0.177,0.192,0.212,0.237,0.254,0.31,0.253,0.238,0.255,0.233,0.236,0.309,0.265,0.345,0.28,0.327,0.306,0.226,0.271,0.236,0.226,0.26,0.26,0.237,0.22,0.271,0.159,0.169,0.178,0.122,0.168,0.135,0.146,0.189,0.15,0.206,0.144,0.16,0.12,0.092,0.09,0.109,0.067,0.06,0.046,0.053,0.05,0.026,0.02,0.017,0.017,0.017,0.02,0.016,0.016,0.013,0.009,0.011,0.01,0.006,0.009,0.006,0.006,0.005,0.004,0.004,0.005,0.004,0.003,0.003,0.002,0.002,0.001,0.001,0.001,0.001,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0],"po":[0.173,0.176,0.204,0.214,0.192,0.218,0.252,0.285,0.25,0.243,0.246,0.216,0.28,0.333,0.249,0.288,0.341,0.228,0.27,0.334,0.248,0.266,0.257,0.279,0.274,0.214,0.25,0.27,0.272,0.278,0.309,0.194,0.195,0.276,0.226,0.297,0.331,0.324,0.304,0.29,0.291,0.356,0.314,0.287,0.244,0.251,0.236,0.31,0.294,0.257,0.222,0.301,0.269,0.272,0.263,0.331,0.27,0.384,0.315,0.233,0.343,0.241,0.247,0.177,0.192,0.212,0.237,0.254,0.31,0.253,0.238,0.255,0.233,0.236,0.309,0.265,0.345,0.28,0.327,0.306,0.226,0.271,0.236,0.226,0.26,0.26,0.237,0.22,0.271,0.159,0.169,0.178,0.122,0.168,0.135,0.146,0.189,0.15,0.206,0.144,0.16,0.12,0.092,0.09,0.109,0.067,0.06,0.046,0.053,0.05,0.026,0.02,0.017,0.017,0.017,0.02,0.016,0.016,0.013,0.009,0.011,0.01,0.006,0.009,0.006,0.006,0.005,0.004,0.004,0.005,0.004,0.003,0.003,0.002,0.002,0.001,0.001,0.001,0.001,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0]},{"n":"04","name":"Award sting","dur":"00:40","kind":"WAV","src":-8.7,"out":-18.0,"state":"Levelled","pk":[0.024,0.027,0.053,0.07,0.126,0.198,0.265,0.301,0.376,1.205,1.344,1.162,0.867,0.897,1.355,0.665,0.883,0.696,0.947,1.29,0.538,0.489,0.503,0.447,0.47,0.424,0.416,0.394,1.172,1.207,1.354,0.808,0.883,1.362,0.873,1.377,1.416,1.198,1.156,0.778,0.708,0.49,0.639,0.698,0.529,0.624,0.907,1.463,1.333,0.914,1.169,1.065,1.134,0.871,1.163,0.906,1.469,1.265,1.076,1.371,1.412,1.099,1.019,1.415,1.033,1.277,1.433,1.168,1.03,1.141,1.269,0.971,1.081,1.188,0.974,1.304,0.853,1.003,1.054,1.122,0.956,0.674,1.165,0.912,1.421,1.251,1.041,0.872,1.132,1.053,1.027,0.944,0.995,0.983,1.343,1.302,1.242,1.344,1.139,1.237,0.959,1.324,1.052,1.427,1.383,1.229,1.382,1.132,1.2,1.125,1.308,1.254,1.385,1.267,1.07,1.199,1.388,1.205,1.24,1.048,1.222,1.135,1.399,1.39,1.005,1.312,1.153,0.913,0.935,1.026,1.005,1.459,1.453,1.427,1.23,1.407,1.332,1.298,1.307,1.264,1.361,1.449,1.216,1.288,1.459,1.394,1.335,1.227,1.398,1.37,1.334,1.358,1.251,1.289,1.187,1.312,1.287,1.401,1.356,1.079,0.38,0.191,0.137,0.097,0.753,1.063,0.886,0.841,1.365,1.145,0.969,1.077,0.879,0.696,0.728,0.571,0.433,0.334,0.255,0.106],"po":[0.008,0.009,0.018,0.024,0.043,0.068,0.091,0.104,0.129,0.414,0.462,0.4,0.298,0.309,0.466,0.229,0.304,0.24,0.326,0.444,0.185,0.168,0.173,0.154,0.162,0.146,0.143,0.135,0.403,0.415,0.466,0.278,0.304,0.468,0.3,0.474,0.487,0.412,0.398,0.268,0.244,0.169,0.22,0.24,0.182,0.215,0.312,0.503,0.458,0.314,0.402,0.366,0.39,0.3,0.4,0.312,0.505,0.435,0.37,0.472,0.486,0.378,0.35,0.487,0.355,0.439,0.493,0.402,0.354,0.392,0.436,0.334,0.372,0.409,0.335,0.449,0.294,0.345,0.362,0.386,0.329,0.232,0.401,0.314,0.489,0.43,0.358,0.3,0.39,0.362,0.353,0.325,0.342,0.338,0.462,0.448,0.427,0.462,0.392,0.425,0.33,0.455,0.362,0.491,0.476,0.423,0.475,0.389,0.413,0.387,0.45,0.431,0.476,0.436,0.368,0.412,0.477,0.414,0.427,0.36,0.42,0.39,0.481,0.478,0.346,0.451,0.397,0.314,0.321,0.353,0.346,0.502,0.5,0.491,0.423,0.484,0.458,0.447,0.449,0.435,0.468,0.498,0.418,0.443,0.502,0.479,0.459,0.422,0.481,0.471,0.459,0.467,0.43,0.443,0.408,0.451,0.443,0.482,0.466,0.371,0.131,0.066,0.047,0.033,0.259,0.366,0.305,0.289,0.469,0.394,0.333,0.37,0.302,0.239,0.25,0.196,0.149,0.115,0.088,0.036]},{"n":"05","name":"Countdown video","dur":"00:04","kind":"MP4","src":-17.3,"out":-17.3,"state":"Already good","pk":[0.002,0.17,0.176,0.153,0.206,0.215,0.191,0.175,0.219,0.18,0.224,0.247,0.282,0.248,0.198,0.236,0.244,0.249,0.195,0.28,0.252,0.279,0.3,0.33,0.196,0.277,0.338,0.253,0.22,0.228,0.272,0.277,0.326,0.172,0.246,0.265,0.232,0.252,0.23,0.277,0.271,0.203,0.213,0.25,0.243,0.254,0.274,0.223,0.2,0.302,0.303,0.194,0.192,0.156,0.198,0.278,0.175,0.223,0.241,0.298,0.331,0.265,0.325,0.299,0.289,0.271,0.286,0.281,0.354,0.255,0.312,0.286,0.239,0.226,0.249,0.207,0.235,0.303,0.248,0.257,0.29,0.212,0.248,0.221,0.224,0.302,0.269,0.253,0.271,0.257,0.256,0.196,0.331,0.27,0.28,0.382,0.315,0.232,0.214,0.337,0.201,0.232,0.196,0.243,0.176,0.19,0.176,0.192,0.21,0.233,0.235,0.254,0.263,0.309,0.234,0.252,0.237,0.237,0.254,0.233,0.229,0.232,0.307,0.305,0.265,0.345,0.271,0.324,0.239,0.322,0.303,0.238,0.233,0.2,0.269,0.245,0.232,0.226,0.218,0.236,0.257,0.217,0.209,0.229,0.215,0.269,0.202,0.163,0.129,0.167,0.139,0.174,0.122,0.161,0.165,0.164,0.135,0.143,0.155,0.187,0.143,0.148,0.206,0.144,0.124,0.159,0.132,0.112,0.121,0.092,0.089,0.071,0.109,0.094,0.061,0.06,0.043,0.046,0.039,0.052],"po":[0.002,0.17,0.176,0.153,0.206,0.215,0.191,0.175,0.219,0.18,0.224,0.247,0.282,0.248,0.198,0.236,0.244,0.249,0.195,0.28,0.252,0.279,0.3,0.33,0.196,0.277,0.338,0.253,0.22,0.228,0.272,0.277,0.326,0.172,0.246,0.265,0.232,0.252,0.23,0.277,0.271,0.203,0.213,0.25,0.243,0.254,0.274,0.223,0.2,0.302,0.303,0.194,0.192,0.156,0.198,0.278,0.175,0.223,0.241,0.298,0.331,0.265,0.325,0.299,0.289,0.271,0.286,0.281,0.354,0.255,0.312,0.286,0.239,0.226,0.249,0.207,0.235,0.303,0.248,0.257,0.29,0.212,0.248,0.221,0.224,0.302,0.269,0.253,0.271,0.257,0.256,0.196,0.331,0.27,0.28,0.382,0.315,0.232,0.214,0.337,0.201,0.232,0.196,0.243,0.176,0.19,0.176,0.192,0.21,0.233,0.235,0.254,0.263,0.309,0.234,0.252,0.237,0.237,0.254,0.233,0.229,0.232,0.307,0.305,0.265,0.345,0.271,0.324,0.239,0.322,0.303,0.238,0.233,0.2,0.269,0.245,0.232,0.226,0.218,0.236,0.257,0.217,0.209,0.229,0.215,0.269,0.202,0.163,0.129,0.167,0.139,0.174,0.122,0.161,0.165,0.164,0.135,0.143,0.155,0.187,0.143,0.148,0.206,0.144,0.124,0.159,0.132,0.112,0.121,0.092,0.089,0.071,0.109,0.094,0.061,0.06,0.043,0.046,0.039,0.052]},{"n":"06","name":"Reflection piano","dur":"01:10","kind":"WAV","src":-36.7,"out":-20.3,"state":"2.2 dB under","pk":[0.0,0.0,0.001,0.001,0.001,0.002,0.004,0.002,0.004,0.007,0.006,0.028,0.063,0.014,0.013,0.011,0.01,0.067,0.022,0.01,0.009,0.008,0.005,0.005,0.004,0.004,0.003,0.002,0.085,0.052,0.01,0.008,0.004,0.006,0.18,0.02,0.014,0.006,0.005,0.004,0.004,0.004,0.003,0.003,0.003,0.002,0.002,0.003,0.102,0.11,0.049,0.026,0.046,0.024,0.011,0.013,0.049,0.013,0.011,0.008,0.006,0.003,0.004,0.003,0.059,0.027,0.016,0.011,0.006,0.006,0.005,0.075,0.036,0.02,0.016,0.012,0.031,0.012,0.012,0.01,0.008,0.013,0.023,0.082,0.033,0.012,0.009,0.009,0.04,0.088,0.031,0.017,0.011,0.009,0.007,0.004,0.004,0.003,0.095,0.032,0.014,0.007,0.006,0.005,0.096,0.061,0.021,0.008,0.008,0.014,0.013,0.007,0.01,0.058,0.025,0.012,0.013,0.011,0.011,0.008,0.089,0.047,0.019,0.005,0.005,0.004,0.005,0.006,0.093,0.025,0.012,0.01,0.007,0.011,0.01,0.005,0.004,0.069,0.062,0.036,0.021,0.015,0.013,0.012,0.011,0.01,0.006,0.086,0.033,0.01,0.01,0.007,0.008,0.012,0.009,0.009,0.006,0.008,0.01,0.049,0.071,0.056,0.086,0.067,0.059,0.074,0.109,0.1,0.106,0.09,0.069,0.065,0.05,0.072,0.046,0.037,0.04,0.022,0.015,0.009],"po":[0.0,0.001,0.004,0.009,0.01,0.011,0.024,0.015,0.03,0.043,0.037,0.184,0.42,0.094,0.087,0.073,0.066,0.447,0.148,0.066,0.059,0.05,0.032,0.033,0.026,0.025,0.019,0.016,0.568,0.347,0.064,0.054,0.026,0.039,1.198,0.132,0.092,0.037,0.033,0.029,0.027,0.024,0.023,0.017,0.017,0.015,0.014,0.022,0.677,0.73,0.324,0.17,0.305,0.161,0.071,0.084,0.328,0.085,0.075,0.053,0.037,0.023,0.027,0.02,0.389,0.181,0.106,0.074,0.04,0.042,0.037,0.502,0.242,0.136,0.108,0.08,0.204,0.078,0.08,0.066,0.052,0.086,0.152,0.543,0.217,0.078,0.059,0.057,0.264,0.587,0.208,0.112,0.074,0.06,0.048,0.026,0.026,0.023,0.629,0.214,0.093,0.046,0.043,0.035,0.638,0.406,0.137,0.052,0.055,0.091,0.085,0.049,0.065,0.384,0.168,0.082,0.084,0.073,0.07,0.051,0.593,0.315,0.126,0.035,0.031,0.028,0.031,0.037,0.616,0.167,0.08,0.066,0.048,0.076,0.063,0.036,0.024,0.461,0.413,0.242,0.142,0.102,0.085,0.08,0.076,0.067,0.04,0.569,0.218,0.069,0.069,0.049,0.052,0.082,0.058,0.057,0.043,0.051,0.066,0.328,0.469,0.374,0.568,0.447,0.393,0.492,0.722,0.665,0.707,0.597,0.457,0.43,0.333,0.48,0.307,0.245,0.265,0.145,0.102,0.06]},{"n":"07","name":"Interval playlist","dur":"01:00","kind":"WAV","src":-19.6,"out":-18.0,"state":"Levelled","pk":[0.0,0.0,0.0,0.036,0.129,0.093,0.163,0.098,0.049,0.057,0.154,0.111,0.141,0.114,0.164,0.15,0.17,0.162,0.165,0.164,0.194,0.187,0.153,0.249,0.169,0.17,0.129,0.306,0.192,0.24,0.193,0.299,0.216,0.251,0.234,0.306,0.216,0.277,0.23,0.32,0.269,0.187,0.185,0.212,0.277,0.221,0.265,0.22,0.336,0.216,0.243,0.219,0.47,0.23,0.33,0.208,0.271,0.251,0.211,0.218,0.298,0.245,0.219,0.32,0.313,0.32,0.33,0.291,0.272,0.331,0.269,0.409,0.229,0.298,0.252,0.287,0.183,0.363,0.278,0.302,0.389,0.299,0.247,0.349,0.32,0.385,0.313,0.329,0.538,0.339,0.325,0.334,0.239,0.237,0.371,0.284,0.286,0.546,0.334,0.388,0.278,0.354,0.427,0.309,0.557,0.307,0.452,0.293,0.359,0.329,0.359,0.327,0.232,0.279,0.547,0.404,0.46,0.424,0.272,0.42,0.33,0.587,0.316,0.393,0.346,0.356,0.292,0.379,0.292,0.283,0.456,0.484,0.31,0.429,0.342,0.357,0.511,0.344,0.629,0.261,0.435,0.423,0.234,0.199,0.324,0.271,0.276,0.483,0.447,0.328,0.451,0.351,0.402,0.295,0.505,0.583,0.419,0.353,0.333,0.292,0.198,0.319,0.265,0.332,0.481,0.454,0.397,0.374,0.388,0.542,0.322,0.519,0.269,0.452,0.341,0.366,0.304,0.33,0.306,0.255],"po":[0.0,0.0,0.0,0.043,0.156,0.112,0.197,0.118,0.06,0.069,0.186,0.134,0.17,0.137,0.198,0.18,0.205,0.196,0.199,0.197,0.235,0.225,0.185,0.3,0.204,0.205,0.155,0.37,0.232,0.29,0.233,0.361,0.261,0.303,0.282,0.369,0.261,0.334,0.277,0.386,0.324,0.225,0.224,0.256,0.335,0.267,0.319,0.266,0.405,0.26,0.294,0.265,0.567,0.277,0.398,0.25,0.326,0.303,0.255,0.263,0.36,0.295,0.264,0.385,0.378,0.386,0.399,0.351,0.328,0.4,0.324,0.494,0.276,0.36,0.304,0.346,0.221,0.438,0.336,0.365,0.469,0.361,0.298,0.421,0.386,0.465,0.378,0.397,0.649,0.409,0.393,0.403,0.288,0.286,0.447,0.342,0.345,0.658,0.403,0.468,0.335,0.427,0.516,0.373,0.672,0.37,0.546,0.353,0.433,0.397,0.433,0.394,0.28,0.336,0.66,0.487,0.555,0.512,0.328,0.507,0.398,0.708,0.382,0.474,0.418,0.429,0.352,0.457,0.353,0.342,0.55,0.584,0.375,0.518,0.413,0.431,0.617,0.414,0.759,0.315,0.525,0.51,0.282,0.24,0.391,0.327,0.333,0.583,0.54,0.395,0.545,0.424,0.485,0.356,0.61,0.703,0.506,0.426,0.402,0.352,0.239,0.385,0.32,0.4,0.581,0.548,0.479,0.452,0.468,0.654,0.389,0.626,0.324,0.545,0.412,0.442,0.367,0.399,0.369,0.307]}];
+(() => {
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const $ = (s, r = document) => r.querySelector(s), $$ = (s, r = document) => [...r.querySelectorAll(s)];
+  const clamp = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v));
+  const fmt = v => (v < 0 ? '−' : '') + Math.abs(v).toFixed(1);
+  const C = { quiet: '#6CB6FF', good: '#4FD18B', changed: '#F2B544', hot: '#FF5D4E', bone: '#EEE9E0', line: '#2A2E34' };
+  const TARGET = -18;
+  const tone = v => Math.abs(v - TARGET) <= 1 ? C.good : (v < TARGET ? C.quiet : C.hot);
+  // Closed-form damped spring, 0 → 1 over u in [0, 1] with a hair of overshoot.
+  const spring = u => { if (u <= 0) return 0; if (u >= 1.2) return 1; const w = 9.5, z = .8, wd = w * Math.sqrt(1 - z * z);
+    return 1 - Math.exp(-z * w * u) * (Math.cos(wd * u) + (z * w / wd) * Math.sin(wd * u)); };
+  const pos = v => clamp((v + 40) / 40);
+
+  /* Nav */
+  const nav = $('#nav');
+  const onScrollNav = () => nav.classList.toggle('solid', scrollY > 40);
+  addEventListener('scroll', onScrollNav, { passive: true }); onScrollNav();
+
+  /* Hero: build the example show */
+  const list = $('#cues');
+  list.innerHTML = CUES.map(c => `<li class="cue"><span class="n num">${c.n}</span><div class="nm"><b>${c.name}</b><span class="num">${c.dur} · ${c.kind}</span></div><canvas></canvas><div class="read"><b class="lufs">${fmt(c.src)}</b><span class="d">LUFS</span></div><span class="state">Measured</span><div class="track" aria-hidden="true"><i class="tgt" style="left:${pos(TARGET) * 100}%"></i><i class="dot"></i></div></li>`).join('');
+  const rows = $$('.cue', list).map((el, i) => ({ el, c: CUES[i], cv: $('canvas', el), lufs: $('.lufs', el), d: $('.d', el), st: $('.state', el), dot: $('.dot', el), tr: $('.track', el), last: -1 }));
+  const drawWave = (r, cur) => {
+    const cv = r.cv, dpr = Math.min(2, devicePixelRatio || 1), W = cv.clientWidth, H = cv.clientHeight;
+    if (!W) return;
+    if (cv.width !== Math.round(W * dpr)) { cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr); }
+    const g = cv.getContext('2d'); g.setTransform(dpr, 0, 0, dpr, 0, 0); g.clearRect(0, 0, W, H);
+    const pk = r.c.pk, po = r.c.po, n = pk.length, gain = Math.pow(10, (cur - r.c.src) / 20), mid = H / 2, bw = W / n;
+    const k = Math.abs(r.c.out - r.c.src) < .05 ? 1 : clamp((cur - r.c.src) / (r.c.out - r.c.src));
+    g.fillStyle = C.line; g.fillRect(0, mid - .5, W, 1);
+    for (let i = 0; i < n; i++) {
+      const a = (1 - k) * pk[i] * gain + k * po[i], h = Math.max(.6, Math.min(1, Math.pow(a, .78)) * (mid - 1));
+      g.fillStyle = a > .97 && cur > TARGET + 1 ? C.hot : 'rgba(238,233,224,.86)';
+      g.fillRect(i * bw, mid - h, Math.max(1, bw * .62), h * 2);
+    }
+  };
+  const spreadEl = $('#spread'), hint = $('#hint');
+  let heroP = -1;
+  const renderHero = p => {
+    if (Math.abs(p - heroP) < 1e-4) return; heroP = p;
+    const curs = [];
+    rows.forEach((r, i) => {
+      const e = spring((p - .05 - i * .06) / .55), cur = r.c.src + (r.c.out - r.c.src) * e;
+      curs.push(cur);
+      r.lufs.textContent = fmt(cur); r.lufs.style.color = tone(cur);
+      const dB = (r.c.out - r.c.src) * Math.min(1, e);
+      r.d.textContent = e < .02 ? 'LUFS' : (Math.abs(r.c.out - r.c.src) < .05 ? 'LUFS · unchanged' : `LUFS · ${dB >= 0 ? '+' : '−'}${Math.abs(dB).toFixed(1)} dB`);
+      const done = e > .985, label = e < .02 ? 'Measured' : done ? r.c.state : 'Levelling';
+      if (r.st.textContent !== label) { r.st.textContent = label; r.st.className = 'state' + (done ? (/under/.test(label) ? ' changed' : ' good') : ''); }
+      r.dot.style.transform = `translateX(${pos(cur) * (r.tr.clientWidth - 8)}px)`; r.dot.style.background = tone(cur);
+      drawWave(r, cur);
+    });
+    spreadEl.textContent = (Math.max(...curs) - Math.min(...curs)).toFixed(1);
+    if (hint) hint.style.opacity = p > .04 ? 0 : 1;
+  };
+
+  /* Scroll scenes: a tall section with a sticky stage; progress 0..1 across its scroll length, smoothed like a scrub */
+  const scenes = [];
+  const scene = (el, fn, smooth = .16) => scenes.push({ el, fn, smooth, p: 0, target: 0, live: false });
+  const measure = s => { const r = s.el.getBoundingClientRect(), len = r.height - innerHeight; s.target = len > 0 ? clamp(-r.top / len) : (r.top < innerHeight * .6 ? 1 : 0); };
+  let raf = 0;
+  const tick = () => {
+    raf = 0; let again = false;
+    for (const s of scenes) { measure(s); const d = s.target - s.p; s.p = Math.abs(d) < .0005 ? s.target : s.p + d * s.smooth; s.fn(s.p); if (s.p !== s.target) again = true; }
+    if (again) raf = requestAnimationFrame(tick);
+  };
+  const kick = () => { if (!raf) raf = requestAnimationFrame(tick); };
+  addEventListener('scroll', kick, { passive: true }); addEventListener('resize', () => { heroP = -1; kick(); });
+
+  const wide = matchMedia('(min-width: 981px)');
+  if (reduce) {
+    renderHero(1);
+  } else if (wide.matches) {
+    scene($('#hero'), p => renderHero(clamp(p / .78)));
+  } else {
+    // Phones and small windows: no pin. The show levels itself once it's on screen.
+    renderHero(0);
+    const io = new IntersectionObserver(es => es.forEach(e => {
+      if (!e.isIntersecting) return; io.disconnect(); const t0 = performance.now();
+      const run = t => { const p = clamp((t - t0) / 2600); renderHero(p); if (p < 1) requestAnimationFrame(run); }; requestAnimationFrame(run);
+    }), { threshold: .55 });
+    io.observe($('.show'));
+  }
+
+  /* Words that light up as you scroll */
+  const man = $('#manifesto');
+  man.innerHTML = man.textContent.split(' ').map(w => `<span class="w">${w}</span>`).join(' ');
+  const words = $$('.w', man);
+  if (!reduce) scene($('#problem'), p => { const k = clamp((p - .08) / .7) * words.length; words.forEach((w, i) => w.style.opacity = clamp(k - i + 1, .16, 1)); }, .2);
+
+  /* App reveal: tilt to flat, then a spotlight that morphs between the three regions */
+  const screen = $('#screen'), hole = $('#holeRect'), ring = $('#ring'), calls = $$('.callout');
+  const R = [ { x: 0, y: 0, w: 1415, h: 840 }, { x: 4, y: 44, w: 224, h: 418 }, { x: 288, y: 90, w: 796, h: 92 }, { x: 1145, y: 46, w: 264, h: 418 } ];
+  const lerp = (a, b, t) => a + (b - a) * t;
+  const setRect = (el, r) => { el.setAttribute('x', r.x); el.setAttribute('y', r.y); el.setAttribute('width', r.w); el.setAttribute('height', r.h); };
+  let lastCall = -1;
+  const renderApp = p => {
+    const tilt = spring(clamp(p / .22));
+    screen.style.transform = `rotateX(${(1 - tilt) * 22}deg) scale(${.86 + .14 * tilt}) translateY(${(1 - tilt) * 40}px)`;
+    // three stops between p = .28 and .95
+    const seg = clamp((p - .26) / .7) * 3, i = Math.min(2, Math.floor(seg)), f = spring(clamp((seg - i) / .55));
+    const a = seg <= 0 ? R[0] : R[i], b = seg <= 0 ? R[0] : R[i + 1];
+    const t = seg <= 0 ? 0 : f;
+    const show = p > .26 ? 1 : clamp((p - .2) / .06);
+    const r = { x: lerp(a.x, b.x, t), y: lerp(a.y, b.y, t), w: lerp(a.w, b.w, t), h: lerp(a.h, b.h, t) };
+    const full = R[0], m = { x: lerp(full.x, r.x, show), y: lerp(full.y, r.y, show), w: lerp(full.w, r.w, show), h: lerp(full.h, r.h, show) };
+    setRect(hole, m); setRect(ring, m); ring.setAttribute('opacity', show);
+    const k = p < .24 ? -1 : i;
+    if (k !== lastCall) { lastCall = k; calls.forEach((c, j) => c.classList.toggle('on', j === k)); }
+  };
+  if (!reduce && wide.matches) scene($('#how'), renderApp, .14);
+
+  /* Compare slider: drag, keyboard, and one sweep when it first appears */
+  const cmp = $('#compare'), cut = $('#cut');
+  const setCut = v => cmp.style.setProperty('--cut', v + '%');
+  cut.addEventListener('input', () => setCut(cut.value));
+  if (!reduce) {
+    const io = new IntersectionObserver(es => es.forEach(e => {
+      if (!e.isIntersecting) return; io.disconnect(); const t0 = performance.now();
+      const run = t => { const u = clamp((t - t0) / 1400), v = 92 - 42 * spring(u); cut.value = v; setCut(v); if (u < 1) requestAnimationFrame(run); };
+      requestAnimationFrame(run);
+    }), { threshold: .6 });
+    io.observe(cmp);
+  }
+
+  /* Reveal on enter, counters, checksum decode */
+  if (!reduce) {
+    document.documentElement.classList.add('pre');
+    const io = new IntersectionObserver(es => es.forEach(e => {
+      if (!e.isIntersecting) return; const el = e.target; io.unobserve(el); el.classList.add('in');
+      $$('[data-count]', el).forEach(countUp); $$('[data-hash]', el).forEach(decode);
+    }), { rootMargin: '0px 0px -8% 0px' });
+    $$('.rv, .mask').forEach((el, i) => { if (el.closest('.hero')) (el.classList.contains('mask') ? el.firstElementChild : el).style.transitionDelay = (i * 80) + 'ms'; io.observe(el); });
+  }
+  function countUp(el) {
+    const to = +el.dataset.count, pre = el.dataset.prefix || '', suf = el.dataset.suffix || '', t0 = performance.now();
+    const run = t => { const u = clamp((t - t0) / 1100), v = to * (1 - Math.pow(1 - u, 4)); el.textContent = pre + v.toFixed(1) + suf; if (u < 1) requestAnimationFrame(run); };
+    requestAnimationFrame(run);
+  }
+  function decode(el, k) {
+    const h = el.dataset.hash, hex = '0123456789abcdef', t0 = performance.now() + (k || 0) * 260;
+    let s = 1;
+    const rnd = () => (s = (s * 16807) % 2147483647) / 2147483647;
+    const run = t => { const u = clamp((t - t0) / 1300), n = Math.floor(u * h.length);
+      el.textContent = h.slice(0, n) + [...h.slice(n)].map(() => hex[Math.floor(rnd() * 16)]).join(''); if (u < 1) requestAnimationFrame(run); };
+    requestAnimationFrame(run);
+  }
+
+  /* Listen: four synthesized cues at uneven levels, optional RMS levelling */
+  const DEMO = [
+    { name: 'Walk-in pad', make: padCue, raw: -24 },
+    { name: 'Drum groove', make: drumCue, raw: -6 },
+    { name: 'Bell sting', make: bellCue, raw: -18 },
+    { name: 'Bass line', make: bassCue, raw: -14 },
+  ];
+  const tracksEl = $('#tracks');
+  tracksEl.innerHTML = DEMO.map((d, i) => `<div class="track-chip" data-i="${i}"><span class="ix">0${i + 1}</span><b>${d.name}</b><span class="lv" data-lv>—</span></div>`).join('');
+  const chips = $$('.track-chip', tracksEl);
+  let ctx, buffers, buffersPre = null, playing = false, levels = [], stopAt = 0;
+  const DUR = 3.2, TARGET_RMS = -24;
+  const levelOn = $('#levelOn'), playBtn = $('#play'), scope = $('#scope'), nowName = $('#nowName'), nowLevel = $('#nowLevel');
+  const showLevels = () => chips.forEach((c, i) => { const v = levels[i]; if (v == null) return; const out = levelOn.checked ? TARGET_RMS : v;
+    const el = $('[data-lv]', c); el.textContent = fmt(out) + ' dB'; el.style.color = Math.abs(out - TARGET_RMS) <= 1.5 ? C.good : (out < TARGET_RMS ? C.quiet : C.hot); });
+  levelOn.addEventListener('change', showLevels);
+  async function render(d) {
+    const sr = 44100, oc = new OfflineAudioContext(1, Math.ceil(sr * DUR), sr);
+    d.make(oc, oc.destination, 0, Math.pow(10, d.raw / 20));
+    const b = await oc.startRendering(), x = b.getChannelData(0);
+    let s = 0; for (let i = 0; i < x.length; i++) s += x[i] * x[i];
+    return { b, rms: 10 * Math.log10(s / x.length + 1e-12) };
+  }
+  async function prepare() {
+    ctx = new (window.AudioContext || window.webkitAudioContext)();
+    if (buffersPre) { buffers = buffersPre; } else { const r = await Promise.all(DEMO.map(render)); buffers = r.map(x => x.b); levels = r.map(x => x.rms); } showLevels();
+  }
+  playBtn.addEventListener('click', async () => {
+    if (playing) { stopAll(); return; }
+    if (!ctx) { playBtn.querySelector('span').textContent = 'Preparing…'; await prepare(); }
+    await ctx.resume(); playing = true; playBtn.querySelector('span').textContent = 'Stop';
+    const an = ctx.createAnalyser(); an.fftSize = 2048; an.connect(ctx.destination);
+    const t0 = ctx.currentTime + .08; nodes = [];
+    buffers.forEach((b, i) => {
+      const src = ctx.createBufferSource(), g = ctx.createGain(); src.buffer = b;
+      g.gain.value = levelOn.checked ? Math.pow(10, (TARGET_RMS - levels[i]) / 20) : 1;
+      src.connect(g).connect(an); src.start(t0 + i * DUR); nodes.push({ src, g, i });
+    });
+    levelOn.onchange = () => { showLevels(); nodes.forEach(n => n.g.gain.setTargetAtTime(levelOn.checked ? Math.pow(10, (TARGET_RMS - levels[n.i]) / 20) : 1, ctx.currentTime, .05)); };
+    stopAt = t0 + DUR * buffers.length; meter(an, t0);
+  });
+  let nodes = [];
+  function stopAll() { nodes.forEach(n => { try { n.src.stop(); } catch (e) {} }); nodes = []; playing = false; playBtn.querySelector('span').textContent = 'Play the show'; chips.forEach(c => c.classList.remove('now')); nowName.textContent = 'Nothing yet'; }
+  function meter(an, t0) {
+    const g = scope.getContext('2d'), buf = new Float32Array(an.fftSize), hist = [];
+    const loop = () => {
+      if (!playing) { drawScope(g, hist, null); return; }
+      const t = ctx.currentTime; if (t >= stopAt) { stopAll(); drawScope(g, hist, null); return; }
+      const i = clamp(Math.floor((t - t0) / DUR), 0, buffers.length - 1);
+      chips.forEach((c, j) => c.classList.toggle('now', j === i)); nowName.textContent = DEMO[i].name;
+      an.getFloatTimeDomainData(buf); let s = 0; for (const v of buf) s += v * v; const db = 10 * Math.log10(s / buf.length + 1e-12);
+      hist.push(db); if (hist.length > 240) hist.shift();
+      nowLevel.textContent = (db < -60 ? '—' : fmt(db)) + ' dB'; drawScope(g, hist, db); requestAnimationFrame(loop);
+    };
+    requestAnimationFrame(loop);
+  }
+  function drawScope(g, hist, db) {
+    const dpr = Math.min(2, devicePixelRatio || 1), W = scope.clientWidth, H = scope.clientHeight;
+    if (scope.width !== Math.round(W * dpr)) { scope.width = Math.round(W * dpr); scope.height = Math.round(H * dpr); }
+    g.setTransform(dpr, 0, 0, dpr, 0, 0); g.clearRect(0, 0, W, H);
+    const y = v => H - clamp((v + 50) / 50) * H, ty = y(TARGET_RMS);
+    g.fillStyle = 'rgba(79,209,139,.10)'; g.fillRect(0, y(TARGET_RMS + 1.5), W, y(TARGET_RMS - 1.5) - y(TARGET_RMS + 1.5));
+    g.strokeStyle = 'rgba(238,233,224,.5)'; g.setLineDash([4, 5]); g.beginPath(); g.moveTo(0, ty); g.lineTo(W, ty); g.stroke(); g.setLineDash([]);
+    const bw = W / 240;
+    hist.forEach((v, i) => { if (v < -60) return; g.fillStyle = Math.abs(v - TARGET_RMS) <= 2.5 ? C.good : (v < TARGET_RMS ? C.quiet : C.hot); const yy = y(v); g.fillRect(i * bw, yy, Math.max(1, bw - .5), H - yy); });
+  }
+  drawScope(scope.getContext('2d'), [], null);
+
+  function env(g, t, a, d, peak, rel) { g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(peak, t + a); g.gain.setTargetAtTime(0, t + a + d, rel); }
+  function padCue(c, out, t, amp) {
+    [261.6, 329.6, 392, 493.9].forEach((f, k) => [-6, 6].forEach(det => {
+      const o = c.createOscillator(), fl = c.createBiquadFilter(), g = c.createGain();
+      o.type = 'sawtooth'; o.frequency.value = f; o.detune.value = det; fl.type = 'lowpass'; fl.frequency.value = 900;
+      g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(amp * .22, t + .6); g.gain.setValueAtTime(amp * .22, t + DUR - .7); g.gain.linearRampToValueAtTime(0, t + DUR);
+      o.connect(fl).connect(g).connect(out); o.start(t); o.stop(t + DUR);
+    }));
+  }
+  function drumCue(c, out, t, amp) {
+    const nb = c.createBuffer(1, c.sampleRate * .3, c.sampleRate), nd = nb.getChannelData(0); let s = 7;
+    for (let i = 0; i < nd.length; i++) { s = (s * 16807) % 2147483647; nd[i] = s / 1073741823.5 - 1; }
+    for (let b = 0; b < 12; b++) {
+      const tt = t + b * .25;
+      if (b % 2 === 0) { const o = c.createOscillator(), g = c.createGain(); o.frequency.setValueAtTime(140, tt); o.frequency.exponentialRampToValueAtTime(45, tt + .18); env(g, tt, .003, .05, amp, .08); o.connect(g).connect(out); o.start(tt); o.stop(tt + .4); }
+      if (b % 4 === 2) { const n = c.createBufferSource(), f = c.createBiquadFilter(), g = c.createGain(); n.buffer = nb; f.type = 'bandpass'; f.frequency.value = 1800; env(g, tt, .002, .03, amp * .9, .05); n.connect(f).connect(g).connect(out); n.start(tt); }
+      { const n = c.createBufferSource(), f = c.createBiquadFilter(), g = c.createGain(); n.buffer = nb; f.type = 'highpass'; f.frequency.value = 7000; env(g, tt + .125, .001, .01, amp * .35, .02); n.connect(f).connect(g).connect(out); n.start(tt + .125); }
+    }
+  }
+  function bellCue(c, out, t, amp) {
+    [0, .8, 1.6].forEach((dt, k) => { const f = [659.3, 784, 987.8][k];
+      const car = c.createOscillator(), mod = c.createOscillator(), mg = c.createGain(), g = c.createGain();
+      car.frequency.value = f; mod.frequency.value = f * 3.5; mg.gain.value = f * 2; mod.connect(mg).connect(car.frequency);
+      env(g, t + dt, .004, .02, amp * .6, .5); car.connect(g).connect(out); car.start(t + dt); mod.start(t + dt); car.stop(t + DUR); mod.stop(t + DUR); });
+  }
+  function bassCue(c, out, t, amp) {
+    const notes = [55, 55, 65.4, 49, 55, 73.4, 65.4, 49];
+    notes.forEach((f, k) => { const tt = t + k * .4, o = c.createOscillator(), fl = c.createBiquadFilter(), g = c.createGain();
+      o.type = 'square'; o.frequency.value = f; fl.type = 'lowpass'; fl.frequency.value = 420; env(g, tt, .01, .2, amp * .5, .08);
+      o.connect(fl).connect(g).connect(out); o.start(tt); o.stop(tt + .4); });
+  }
+
+
+  /* Film: plays while on screen (unless reduced motion), with a pause button */
+  const vid = $('#filmVid'), fb = $('#filmBtn'), icon = $('#filmIcon');
+  let userPaused = reduce;
+  const setIcon = () => { const p = vid.paused; icon.setAttribute('d', p ? 'M6 4.5v11l9-5.5z' : 'M6 4h3v12H6zM11 4h3v12h-3z'); fb.setAttribute('aria-label', p ? 'Play the film' : 'Pause the film'); };
+  fb.addEventListener('click', () => { if (vid.paused) { userPaused = false; vid.play().catch(() => {}); } else { userPaused = true; vid.pause(); } });
+  vid.addEventListener('play', setIcon); vid.addEventListener('pause', setIcon); setIcon();
+  new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting && !userPaused) vid.play().catch(() => {}); else if (!e.isIntersecting) vid.pause(); }), { threshold: .4 }).observe(vid);
+
+  // Measure the demo cues up front (no sound needed), so their levels show before anyone presses play
+  (async () => { try { const r = await Promise.all(DEMO.map(render)); levels = r.map(x => x.rms); buffersPre = r.map(x => x.b); showLevels(); } catch (e) {} })();
+  // First paint
+  renderHero(reduce ? 1 : 0);
+  if (!reduce && wide.matches) renderApp(0);
+  kick();
+  if (document.fonts) document.fonts.ready.then(() => { heroP = -1; kick(); });
+})();
+</script>
+</body>
+</html>
