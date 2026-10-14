@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#121417">
+<title>Open-source licences · CueLevel</title>
+<meta name="description" content="Open-source software in CueLevel, its licences, and where to get the source.">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="canonical" href="https://cuelevel.com/licenses.html">
+<link rel="stylesheet" href="legal.css">
+</head>
+<body>
+<header class="top"><div class="wrap"><a class="brand" href="./" aria-label="CueLevel home"><svg viewBox="0 0 28 28" aria-hidden="true"><rect x="3" y="10" width="2.4" height="8" rx="1.2" fill="#EEE9E0"/><rect x="7.4" y="4" width="2.4" height="20" rx="1.2" fill="#EEE9E0"/><rect x="11.8" y="8" width="2.4" height="12" rx="1.2" fill="#EEE9E0"/><rect x="16.2" y="9" width="2.4" height="10" rx="1.2" fill="#4FD18B"/><rect x="20.6" y="9" width="2.4" height="10" rx="1.2" fill="#4FD18B"/><rect x="25" y="9" width="2.4" height="10" rx="1.2" fill="#4FD18B"/></svg>CueLevel</a><nav aria-label="Legal pages"><a href="privacy.html">Privacy</a><a href="terms.html">Terms</a><a href="licenses.html" aria-current="page">Open-source licences</a></nav></div></header>
+<main><div class="wrap"><article class="doc">
+<h1>Open-source licences</h1>
+<p class="updated">Last updated 13 October 2026</p>
+<p class="lede">CueLevel is built with open-source software. Thank you to the people who make it. Here is what’s included, its licence, and where to get its source.</p>
+
+<h2>FFmpeg</h2>
+<p>CueLevel runs <a href="https://ffmpeg.org" rel="noopener">FFmpeg</a> 7.1 as a separate program inside the app (<code>CueLevel.app/Contents/Resources/ffmpeg</code>) to decode, measure, filter and write audio. It’s built from the official FFmpeg 7.1 source release with no changes to that source, with GPL and non-free components switched off and no external libraries.</p>
+<div class="box">
+<p><strong>Licence:</strong> GNU Lesser General Public License, version 2.1 or later. <a href="licenses/FFmpeg-LGPL-2.1.txt">Read the LGPL 2.1</a>.</p>
+<p><strong>Corresponding source:</strong> <a href="https://ffmpeg.org/releases/ffmpeg-7.1.tar.xz" rel="noopener">ffmpeg-7.1.tar.xz</a>, the official source archive the engine is built from. From CueLevel 2.0.2 onwards, the exact archive and build configuration are also attached to every release on the <a href="https://github.com/chugs024/cuelevel-updates/releases" rel="noopener">CueLevel releases page</a>.</p>
+<p><strong>Build configuration:</strong> <code>./configure --arch=arm64 --target-os=darwin --cc=clang --extra-cflags=-mmacosx-version-min=13.0 --extra-ldflags=-mmacosx-version-min=13.0 --enable-static --disable-shared --disable-gpl --disable-nonfree --disable-autodetect --enable-zlib --disable-doc --disable-ffplay --disable-ffprobe --disable-network --disable-debug</code></p>
+<p><strong>Written offer:</strong> for at least three years after you receive any version of CueLevel, we will send you a complete copy of the corresponding FFmpeg source code on request, for no more than the cost of providing it. Write to <a href="mailto:hello@cuelevel.com">hello@cuelevel.com</a>.</p>
+<p>Because FFmpeg runs as its own program, you can replace <code>Contents/Resources/ffmpeg</code> with your own build of FFmpeg 7.1. The copy inside the app is covered by the app’s code signature, so macOS will treat a modified app as unsigned.</p>
+</div>
+<p>FFmpeg is a trademark of Fabrice Bellard, originator of the FFmpeg project. CueLevel isn’t affiliated with or endorsed by the FFmpeg project.</p>
+
+<h2>RNNoise speech model</h2>
+<p>CueLevel’s speech cleanup uses the original RNNoise model from <a href="https://github.com/xiph/rnnoise" rel="noopener">Xiph.Org</a>, in the format FFmpeg reads. Copyright Jean-Marc Valin, Amazon, Mozilla, the Xiph.Org Foundation and Mark Borgerding. Licensed under the BSD 3-clause licence. <a href="licenses/RNNoise-BSD.txt">Read the licence</a>.</p>
+
+<h2>Website fonts</h2>
+<ul>
+<li><strong>Archivo</strong> by Omnibus-Type, under the SIL Open Font License 1.1. <a href="licenses/Archivo-OFL.txt">Read the licence</a>.</li>
+<li><strong>Geist</strong> by Vercel, under the SIL Open Font License 1.1. <a href="licenses/Geist-OFL.txt">Read the licence</a>.</li>
+</ul>
+
+<h2>Inside the app</h2>
+<p>The same notices and full licence texts ship inside CueLevel, in <code>CueLevel.app/Contents/Resources/Third-party notices</code>. To open it, Control-click CueLevel in Finder, choose <strong>Show Package Contents</strong>, then open Contents › Resources.</p>
+
+</article></div></main>
+<footer><div class="wrap">
+  <span>© 2026 Chugs. CueLevel is free for Mac.</span>
+  <nav aria-label="Legal"><a href="privacy.html">Privacy</a><a href="terms.html">Terms</a><a href="licenses.html">Open-source licences</a><a href="mailto:hello@cuelevel.com">Contact</a></nav>
+  <span class="tm">Apple, Mac and macOS are trademarks of Apple Inc., registered in the U.S. and other countries and regions. QLab, Resolume and ProPresenter are trademarks of their respective owners. FFmpeg is a trademark of Fabrice Bellard. CueLevel is not affiliated with or endorsed by any of them.</span>
+</div></footer>
+</body>
+</html>
