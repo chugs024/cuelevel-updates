@@ -1,12 +1,12 @@
 {
   "schema": 1,
-  "version": "2.0.1",
-  "build": 115,
+  "version": "2.0.2",
+  "build": 118,
   "minimumSystemVersion": "13.0",
-  "published": "2026-10-14T03:34:04Z",
-  "url": "https://github.com/chugs024/cuelevel-updates/releases/download/v2.0.1/CueLevel-2.0.1.dmg",
-  "sha256": "068f2443489cf86b0dc890467580b9b372a76ba4257a694011aa0db90efd0cf1",
-  "size": 13351253,
+  "published": "2026-10-14T18:30:28Z",
+  "url": "https://github.com/chugs024/cuelevel-updates/releases/download/v2.0.2/CueLevel-2.0.2.dmg",
+  "sha256": "b336285f52f3b6abf532f3cd926593751eb5d9c5b374c05ee6e7a67f7cbb3496",
+  "size": 13440889,
   "teamID": "327ABFB3W2",
-  "notes": "Fixed: dropping many files at once no longer leaves all but the first waiting, and levelling no longer freezes at Starting.\nMusic is never evened out: cues that play continuously like a song keep their loud and quiet parts. Each cue's type (Voice, Music, Music + voice) can now be set from its header.\nEven out never lifts a fade-in or fade-out, never makes a stretch peak above the cue's loudest peak, and now handles long quiet passages.\nLevelling with Even out is faster (the clip gain is rendered once).\nYou can drop a whole folder, or use Open With from Finder.\nClear reasons for files that can't be levelled: empty, damaged, or with no audio track. Silent cues say so.\nFixes: live meter labels, waveform stripes, leaving Edit mode while busy, the play button at the end of a cue, Level all skips unreadable files."
+  "notes": "Long videos are measured far faster: CueLevel now reads only the audio, once, with progress the whole way. An 8-minute 1080p video went from 25 seconds to under 1, and long camera recordings no longer look frozen while they're measured.\nRecordings that go over full scale now show Possible clipping. Levelling turns a cue down or up cleanly, but it can't remove distortion that's already in the recording.\nLoudness is now measured with the standard EBU R 128 meter, the same as CueLevel for iPhone and iPad. Fast-decaying sounds such as stings can read up to 0.4 LU louder than before."
 }
