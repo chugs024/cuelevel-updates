@@ -1,12 +1,12 @@
 {
   "schema": 1,
-  "version": "2.0.0",
-  "build": 114,
+  "version": "2.0.1",
+  "build": 115,
   "minimumSystemVersion": "13.0",
-  "published": "2026-10-14T02:45:42Z",
-  "url": "https://github.com/chugs024/cuelevel-updates/releases/download/v2.0.0/CueLevel-2.0.0.dmg",
-  "sha256": "03ccb97ad5442ce4cc35c68b18663ec0bba2b79a87b2cec1832dfaed34c571a6",
-  "size": 13287860,
+  "published": "2026-10-14T03:34:04Z",
+  "url": "https://github.com/chugs024/cuelevel-updates/releases/download/v2.0.1/CueLevel-2.0.1.dmg",
+  "sha256": "068f2443489cf86b0dc890467580b9b372a76ba4257a694011aa0db90efd0cf1",
+  "size": 13351253,
   "teamID": "327ABFB3W2",
-  "notes": "A new look: one window with your cues on the left, the cue in the middle and what CueLevel will do on the right.\nBefore levelling, CueLevel shows each step it plans (trim, even out, repairs, gain) with a tick box to skip any of them, and predicts the result.\nA big loudness readout shows where the cue is now, where it will land and the target, on one ruler.\nColour now means level everywhere: blue is quiet, green is on target, amber is changed, red is too hot.\nPrepare and Edit modes: Edit opens the clip gain editor (⌘E).\nShow settings (⌘,) gathers loudness, files, references and processing in one place.\nLossless gain-only levelling is now the default file type.\nNew icon."
+  "notes": "Fixed: dropping many files at once no longer leaves all but the first waiting, and levelling no longer freezes at Starting.\nMusic is never evened out: cues that play continuously like a song keep their loud and quiet parts. Each cue's type (Voice, Music, Music + voice) can now be set from its header.\nEven out never lifts a fade-in or fade-out, never makes a stretch peak above the cue's loudest peak, and now handles long quiet passages.\nLevelling with Even out is faster (the clip gain is rendered once).\nYou can drop a whole folder, or use Open With from Finder.\nClear reasons for files that can't be levelled: empty, damaged, or with no audio track. Silent cues say so.\nFixes: live meter labels, waveform stripes, leaving Edit mode while busy, the play button at the end of a cue, Level all skips unreadable files."
 }
